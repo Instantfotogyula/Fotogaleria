@@ -840,8 +840,7 @@ async function rendeleKuld() {
       await fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
     }
     document.getElementById('modal-bg').classList.remove('aktiv');
-    document.getElementById('galeria').style.display = 'none';
-    document.getElementById('siker').classList.add('aktiv');
+    mutat('siker');
   } catch(e) {
     alert('Hiba a küldéskor. Kérjük próbáld újra!');
     btn.disabled = false;
@@ -854,9 +853,11 @@ async function rendeleKuld() {
 // ============================================================
 function mutat(id) {
   ['loading','galeria','hiba','zart','siker'].forEach(s => {
-    document.getElementById(s).style.display = 'none';
+    const el = document.getElementById(s);
+    if (el) el.style.display = 'none';
   });
-  document.getElementById(id).style.display = id === 'galeria' ? 'block' : 'block';
+  const cel = document.getElementById(id);
+  if (cel) cel.style.display = 'block';
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fullscreenBezar(); });
