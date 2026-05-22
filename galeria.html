@@ -211,6 +211,19 @@
     transition: opacity 0.2s;
   }
   .kep-kartya.aktiv .kep-pipa { opacity: 1; }
+  .kep-zoom {
+    position: absolute;
+    bottom: 0.5rem; right: 0.5rem;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .kep-zoom:hover { background: rgba(0,0,0,0.8); }
 
   /* Rendelési panel */
   .rendeles-panel {
@@ -641,11 +654,12 @@ function galeriaMegjelenít() {
         <img src="${thumbUrl}" alt="${sorszam}" loading="lazy" draggable="false">
         <div class="kep-sorszam">${sorszam}</div>
         <div class="kep-pipa">✓</div>
+        <div class="kep-zoom" onclick="event.stopPropagation(); fullscreenMegnyit('${fullUrl}', '${sorszam}')">🔍</div>
       </div>
       <div class="rendeles-panel">${panelHtml}</div>
     `;
 
-    // Dupla kattintás = fullscreen
+    // Dupla kattintás = fullscreen (asztali gépen)
     kartya.querySelector('img').addEventListener('dblclick', e => {
       e.stopPropagation();
       fullscreenMegnyit(fullUrl, sorszam);
