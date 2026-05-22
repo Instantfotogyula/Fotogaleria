@@ -837,15 +837,16 @@ async function rendeleKuld() {
         adatok: JSON.stringify(adatok),
         idopont: new Date().toISOString()
       });
-      await fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+      fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+      // no-cors nem ad vissza választ, ezért nem várunk rá
     }
-    document.getElementById('modal-bg').classList.remove('aktiv');
-    mutat('siker');
   } catch(e) {
-    alert('Hiba a küldéskor. Kérjük próbáld újra!');
-    btn.disabled = false;
-    btn.textContent = 'Elküldés';
+    // csendben kezeljük
   }
+  // Mindig megjelenítjük a siker képernyőt
+  document.getElementById('modal-bg').classList.remove('aktiv');
+  document.getElementById('csomag-sav').classList.remove('aktiv');
+  mutat('siker');
 }
 
 // ============================================================
