@@ -452,7 +452,8 @@
 <div id="modal-bg">
   <div id="modal">
     <h2 id="modal-cim">🛒 Összesítő</h2>
-    <input class="nev-input" id="rendelo-nev" placeholder="Az Ön neve" type="text">
+    <input class="nev-input" id="rendelo-nev" placeholder="Az Ön neve *" type="text">
+    <input class="nev-input" id="rendelo-email" placeholder="Email cím *" type="email">
     <div id="ossz-lista"></div>
     <div class="ossz-total"><span>Összesen:</span><span id="ossz-ar">0 Ft</span></div>
     <button class="kuldes-btn" id="kuldes-btn" onclick="rendeleKuld()">Elküldés</button>
@@ -796,8 +797,15 @@ function kosarBezar() {
 
 async function rendeleKuld() {
   const nev = document.getElementById('rendelo-nev').value.trim();
+  const email = document.getElementById('rendelo-email').value.trim();
   if (!nev) {
     alert('Kérjük add meg a nevedet!');
+    document.getElementById('rendelo-nev').focus();
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    alert('Kérjük add meg az email címedet!');
+    document.getElementById('rendelo-email').focus();
     return;
   }
 
@@ -833,7 +841,7 @@ async function rendeleKuld() {
   try {
     if (webhookUrl) {
       const params = new URLSearchParams({
-        nev, album: albumConfig.id,
+        nev, email, album: albumConfig.id,
         adatok: JSON.stringify(adatok),
         idopont: new Date().toISOString()
       });
