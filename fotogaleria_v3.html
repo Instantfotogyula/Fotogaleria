@@ -244,6 +244,7 @@
     justify-content: space-between;
     padding: 0.3rem 0;
     border-bottom: 1px solid var(--border);
+    gap: 0.3rem;
   }
   .meret-sor:last-child { border-bottom: none; }
   .meret-nev {
@@ -251,16 +252,20 @@
     color: var(--text);
     font-weight: 500;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
   }
   .meret-ar {
     font-size: 0.75rem;
     color: var(--muted);
     margin-right: 0.75rem;
+    white-space: nowrap;
   }
   .szamlalo {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    flex-shrink: 0;
   }
   .szamlalo button {
     width: 1.8rem; height: 1.8rem;
@@ -273,6 +278,7 @@
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
     color: var(--text);
+    flex-shrink: 0;
   }
   .szamlalo button:hover {
     border-color: var(--accent);
@@ -441,7 +447,7 @@
 <script>
   const CONFIG = {
     folderId:   '1j4gkwp_jgzrNno5LlLcYo5c7IIB7Z1TA',
-    apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
+    apiKey:     'AIzaSyCSi7GZAk4KHO7HGjctSRK1cYIOmldcfcA',
     webhookUrl: 'https://script.google.com/macros/s/AKfycbw_vPs92IOJnRrbtmtlaBo8fEi_ngWVrPOUBMjWCTJkZL42jsdIYH1s3wf6kicZ-Fc/exec',
     osztaly:    'Teszt osztály'
   };
@@ -497,7 +503,7 @@ const MERETEK = [
   { id: '10x15',      nev: '10×15 cm',        ar: 600,  megjegyzes: '',                        egyseg: 'db' },
   { id: '13x18',      nev: '13×18 cm',        ar: 750,  megjegyzes: '',                        egyseg: 'db' },
   { id: '20x30',      nev: '20×30 cm',        ar: 950,  megjegyzes: '',                        egyseg: 'db' },
-  { id: 'igazolvany', nev: 'Igazolványkép',   ar: 600,  megjegyzes: '6 db / adag',             egyseg: 'adag' },
+  { id: 'igazolvany', nev: 'Ig.kép',           ar: 600,  megjegyzes: '6 db / adag',             egyseg: 'adag' },
 ];
 
 let kepek = [];
