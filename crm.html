@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instantfoto CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22263a;
+  --border: #2e3248;
+  --accent: #4ade80;
+  --accent2: #f59e0b;
+  --accent3: #60a5fa;
+  --danger: #f87171;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --font: 'DM Sans', sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* LAYOUT */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--accent);
+  font-weight: 400;
+}
+.sidebar-logo p { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+
+.sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.aktiv { background: var(--surface2); color: var(--accent); }
+.nav-item .icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+
+.sidebar-bottom {
+  padding: 1rem 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.sync-btn {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s;
+}
+.sync-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOPBAR */
+.topbar {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.topbar h2 { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; }
+.topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #0f1117; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* FILTERS */
+.filters {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.filter-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.4rem;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--accent); }
+.search-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.4rem;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  outline: none;
+  width: 200px;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--muted); }
+
+/* STATS */
+.stats-bar {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-label { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.stat-value.green { color: var(--accent); }
+.stat-value.amber { color: var(--accent2); }
+.stat-value.red { color: var(--danger); }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+
+/* ÜGYFÉL LISTA */
+.ugyfel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.ugyfel-kartya {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.ugyfel-kartya:hover { border-color: var(--accent); transform: translateY(-1px); }
+.ugyfel-kartya.kintlevo { border-left: 3px solid var(--danger); }
+.ugyfel-kartya.fizetve { border-left: 3px solid var(--accent); }
+.ugyfel-kartya.reszben { border-left: 3px solid var(--accent2); }
+
+.uk-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.uk-nev { font-weight: 600; font-size: 0.95rem; }
+.uk-tipus { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+
+.statusz-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.uk-info { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; }
+.uk-info-sor { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--muted); }
+.uk-info-sor span { color: var(--text); }
+
+.uk-penzugyek {
+  background: var(--surface2);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.uk-osszeg { font-family: var(--mono); font-size: 0.82rem; }
+.uk-osszeg .label { color: var(--muted); font-size: 0.7rem; }
+.uk-osszeg .ertek { font-weight: 600; }
+.uk-osszeg .ertek.pozitiv { color: var(--danger); }
+.uk-osszeg .ertek.nulla { color: var(--accent); }
+
+.uk-tennivalo {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--accent2);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: var(--muted);
+}
+.loading-spinner {
+  width: 32px; height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+.modal-overlay.aktiv { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 680px;
+  padding: 1.5rem;
+  position: relative;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+.modal-close:hover { color: var(--text); }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-input, .form-select, .form-textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select option { background: var(--surface2); }
+
+.form-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.form-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* BEFIZETÉS LISTA */
+.befizetes-lista { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+.befizetes-sor {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+.befizetes-sor .b-bal { display: flex; flex-direction: column; gap: 2px; }
+.befizetes-sor .b-datum { color: var(--muted); font-size: 0.72rem; font-family: var(--mono); }
+.befizetes-sor .b-osszeg { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+.befizetes-sor .b-mod { font-size: 0.7rem; color: var(--muted); }
+.befizetes-sor .b-torles {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.2rem;
+}
+.befizetes-sor .b-torles:hover { color: var(--danger); }
+
+.befizetes-form {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+/* PÉNZÜGYI ÖSSZESÍTŐ */
+.penzugyi-ossz {
+  background: var(--surface2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.po-item { text-align: center; }
+.po-label { font-size: 0.65rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; margin-bottom: 4px; }
+.po-ertek { font-family: var(--mono); font-weight: 700; font-size: 1rem; }
+
+/* STATUSZ SZINEK */
+.s-megkereses { background: rgba(107,114,128,0.2); color: #9ca3af; }
+.s-egyeztetes { background: rgba(96,165,250,0.2); color: #60a5fa; }
+.s-lefoglalva { background: rgba(167,139,250,0.2); color: #a78bfa; }
+.s-lefotózva { background: rgba(251,191,36,0.2); color: #fbbf24; }
+.s-valogatásra { background: rgba(251,146,60,0.2); color: #fb923c; }
+.s-retusálás { background: rgba(239,68,68,0.2); color: #ef4444; }
+.s-rendeles { background: rgba(34,197,94,0.2); color: #22c55e; }
+.s-fizetes { background: rgba(20,184,166,0.2); color: #14b8a6; }
+.s-atadva { background: rgba(74,222,128,0.2); color: #4ade80; }
+.s-lezarva { background: rgba(107,114,128,0.15); color: #6b7280; }
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+.btn-danger:hover { background: rgba(248,113,113,0.25); }
+
+/* ÜRES ÁLLAPOT */
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .befizetes-form { grid-template-columns: 1fr 1fr; }
+  .ugyfel-grid { grid-template-columns: 1fr; }
+  .stats-bar { gap: 1rem; flex-wrap: wrap; }
+  .penzugyi-ossz { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Instantfoto</h1>
+      <p>CRM rendszer</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item aktiv" onclick="nezet('ugyfelek')">
+        <span class="icon">👥</span> Ügyfelek
+      </div>
+      <div class="nav-item" onclick="nezet('dashboard')">
+        <span class="icon">📊</span> Áttekintő
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="sync-btn" onclick="adatokBetolt()">
+        <span id="sync-icon">🔄</span> Szinkronizálás
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h2 id="nezet-cim">Ügyfelek</h2>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="ujUgyfelModal()">+ Új ügyfél</button>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters" id="filters-bar">
+      <input type="text" class="search-input" id="search-input" placeholder="🔍 Keresés..." oninput="szures()">
+      <select class="filter-select" id="filter-statusz" onchange="szures()">
+        <option value="">Minden státusz</option>
+      </select>
+      <select class="filter-select" id="filter-tipus" onchange="szures()">
+        <option value="">Minden típus</option>
+      </select>
+      <select class="filter-select" id="filter-penzugy" onchange="szures()">
+        <option value="">Minden pénzügy</option>
+        <option value="kintlevo">Kintlévőség van</option>
+        <option value="fizetve">Teljesen fizetve</option>
+        <option value="reszben">Részben fizetve</option>
+      </select>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Összes ügyfél</span>
+        <span class="stat-value" id="stat-osszes">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Aktív</span>
+        <span class="stat-value amber" id="stat-aktiv">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Kintlévőség</span>
+        <span class="stat-value red" id="stat-kintlevo">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Befolyt</span>
+        <span class="stat-value green" id="stat-befolyt">—</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+      <div class="loading"><div class="loading-spinner"></div><p>Adatok betöltése...</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- ÚJ/SZERKESZTÉS MODAL -->
+<div class="modal-overlay" id="ugyfel-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-cim">Új ügyfél</h3>
+      <button class="modal-close" onclick="modalBezar('ugyfel-modal')">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Név *</label>
+        <input type="text" class="form-input" id="f-nev" placeholder="Kiss Anna">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="f-email" placeholder="kiss@gmail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefon</label>
+        <input type="text" class="form-input" id="f-telefon" placeholder="+36 30 123 4567">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Csatorna</label>
+        <select class="form-select" id="f-csatorna"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fotózás típusa</label>
+        <select class="form-select" id="f-tipus"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Státusz</label>
+        <select class="form-select" id="f-statusz"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Album ID</label>
+        <input type="text" class="form-input" id="f-album" placeholder="album01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alapdíj (Ft)</label>
+        <input type="number" class="form-input" id="f-alapdij" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dátum</label>
+        <input type="date" class="form-input" id="f-datum">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Következő tennivaló</label>
+        <input type="text" class="form-input" id="f-tennivalo" placeholder="pl. Linket küldeni">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Megjegyzés</label>
+        <textarea class="form-textarea" id="f-megjegyzes" placeholder="Bármilyen fontos info..."></textarea>
+      </div>
+    </div>
+
+    <!-- PÉNZÜGYEK -->
+    <div class="form-section" id="penzugyek-szekció">
+      <div class="form-section-title">💰 Pénzügyek</div>
+
+      <div class="penzugyi-ossz">
+        <div class="po-item">
+          <div class="po-label">Teljes összeg</div>
+          <div class="po-ertek" id="po-teljes">— Ft</div>
+        </div>
+        <div class="po-item">
+          <div class="po-label">Befizetett</div>
+          <div class="po-ertek" style="color:var(--accent)" id="po-befizetve">0 Ft</div>
+        </div>
+        <div class="po-item">
+          <div class="po-label">Egyenleg</div>
+          <div class="po-ertek" id="po-egyenleg">— Ft</div>
+        </div>
+      </div>
+
+      <div class="befizetes-lista" id="befizetes-lista"></div>
+
+      <!-- ÚJ BEFIZETÉS FORM -->
+      <div class="befizetes-form">
+        <div class="form-group">
+          <label class="form-label">Dátum</label>
+          <input type="date" class="form-input" id="b-datum">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Összeg (Ft)</label>
+          <input type="number" class="form-input" id="b-osszeg" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mód</label>
+          <select class="form-select" id="b-mod">
+            <option>Utalás</option>
+            <option>Készpénz</option>
+            <option>Kártya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">&nbsp;</label>
+          <button class="btn btn-secondary" onclick="befizetesHozzaad()" style="white-space:nowrap">+ Hozzáad</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-danger" id="torles-btn" onclick="ugyfelTorol()" style="display:none">Törlés</button>
+      <button class="btn btn-secondary" onclick="modalBezar('ugyfel-modal')">Mégse</button>
+      <button class="btn btn-primary" onclick="ugyfelMent()">Mentés</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// KONFIGURÁCIÓ
+// ============================================================
+const CONFIG = {
+  crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
+  apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
+  // Apps Script webhook a CRM írásához (külön kell beállítani!)
+  webhookUrl: '',
+};
+
+// ============================================================
+// ÁLLAPOT
+// ============================================================
+let ugyfelek = [];
+let befizetek = [];
+let beallitasok = { tipusok: [], statuszok: [], csatornak: [] };
+let aktualisUgyfelId = null;
+let aktualisBefizetek = [];
+let pluszRendeles = {}; // email → összeg (Rendelések Sheets-ből)
+
+// ============================================================
+// INDULÁS
+// ============================================================
+window.addEventListener('load', adatokBetolt);
+
+async function adatokBetolt() {
+  document.getElementById('sync-icon').textContent = '⏳';
+  document.getElementById('content').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Adatok betöltése...</p></div>';
+
+  try {
+    await Promise.all([
+      beallitasokBetolt(),
+      ugyfelekBetolt(),
+      befizetesBetolt(),
+    ]);
+    filterekFeltolt();
+    listaFrissit();
+    statisztikakFrissit();
+  } catch(e) {
+    document.getElementById('content').innerHTML = `<div class="empty-state"><div class="icon">😕</div><p>Betöltési hiba: ${e.message}</p><br><button class="btn btn-secondary" onclick="adatokBetolt()">Újra</button></div>`;
+  }
+  document.getElementById('sync-icon').textContent = '🔄';
+}
+
+async function sheetsOlvas(range) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.crmSheetsId}/values/${encodeURIComponent(range)}?key=${CONFIG.apiKey}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('Sheets API hiba: ' + r.status);
+  const d = await r.json();
+  return d.values || [];
+}
+
+async function beallitasokBetolt() {
+  const rows = await sheetsOlvas('Beállítások!A1:E20');
+  beallitasok.tipusok = rows.slice(1).map(r => r[0]).filter(Boolean);
+  beallitasok.statuszok = rows.slice(1).map(r => r[2]).filter(Boolean);
+  beallitasok.csatornak = rows.slice(1).map(r => r[4]).filter(Boolean);
+}
+
+async function ugyfelekBetolt() {
+  const rows = await sheetsOlvas('Ügyfelek!A2:L200');
+  ugyfelek = rows.filter(r => r[0]).map(r => ({
+    id: r[0] || '',
+    nev: r[1] || '',
+    email: r[2] || '',
+    telefon: r[3] || '',
+    csatorna: r[4] || '',
+    tipus: r[5] || '',
+    statusz: r[6] || '',
+    tennivalo: r[7] || '',
+    albumId: r[8] || '',
+    alapdij: parseFloat(r[9]) || 0,
+    datum: r[10] || '',
+    megjegyzes: r[11] || '',
+  }));
+}
+
+async function befizetesBetolt() {
+  const rows = await sheetsOlvas('Befizetések!A2:F500');
+  befizetek = rows.filter(r => r[0]).map(r => ({
+    id: r[0] || '',
+    ugyfelId: r[1] || '',
+    datum: r[2] || '',
+    osszeg: parseFloat(r[3]) || 0,
+    mod: r[4] || '',
+    megjegyzes: r[5] || '',
+  }));
+}
+
+// ============================================================
+// UI
+// ============================================================
+function nezet(n) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('aktiv'));
+  event.currentTarget.classList.add('aktiv');
+  document.getElementById('nezet-cim').textContent = n === 'ugyfelek' ? 'Ügyfelek' : 'Áttekintő';
+  listaFrissit();
+}
+
+function filterekFeltolt() {
+  const statSelect = document.getElementById('filter-statusz');
+  const tipusSelect = document.getElementById('filter-tipus');
+  const fStatusz = document.getElementById('f-statusz');
+  const fTipus = document.getElementById('f-tipus');
+  const fCsatorna = document.getElementById('f-csatorna');
+
+  statSelect.innerHTML = '<option value="">Minden státusz</option>' +
+    beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
+  tipusSelect.innerHTML = '<option value="">Minden típus</option>' +
+    beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
+  fStatusz.innerHTML = beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
+  fTipus.innerHTML = beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
+  fCsatorna.innerHTML = beallitasok.csatornak.map(c => `<option>${c}</option>`).join('');
+}
+
+function szures() {
+  listaFrissit();
+}
+
+function listaFrissit() {
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const statusz = document.getElementById('filter-statusz')?.value || '';
+  const tipus = document.getElementById('filter-tipus')?.value || '';
+  const penzugy = document.getElementById('filter-penzugy')?.value || '';
+
+  let szurt = ugyfelek.filter(u => {
+    if (search && !u.nev.toLowerCase().includes(search) && !u.email.toLowerCase().includes(search)) return false;
+    if (statusz && u.statusz !== statusz) return false;
+    if (tipus && u.tipus !== tipus) return false;
+    if (penzugy) {
+      const egyenleg = ugyfelEgyenleg(u);
+      if (penzugy === 'kintlevo' && egyenleg <= 0) return false;
+      if (penzugy === 'fizetve' && egyenleg !== 0) return false;
+      if (penzugy === 'reszben') {
+        const befiz = ugyfelBefizetve(u);
+        if (befiz === 0 || egyenleg <= 0) return false;
+      }
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('content');
+
+  if (szurt.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>Nincs találat</p></div>';
+    return;
+  }
+
+  grid.innerHTML = `<div class="ugyfel-grid">${szurt.map(u => ugyfelKartyaHTML(u)).join('')}</div>`;
+}
+
+function ugyfelKartyaHTML(u) {
+  const befizetve = ugyfelBefizetve(u);
+  const teljes = ugyfelTeljes(u);
+  const egyenleg = teljes - befizetve;
+  
+  let penzClass = '';
+  if (egyenleg > 0 && befizetve > 0) penzClass = 'reszben';
+  else if (egyenleg > 0) penzClass = 'kintlevo';
+  else if (teljes > 0) penzClass = 'fizetve';
+
+  const statuszClass = 's-' + (u.statusz || '').toLowerCase()
+    .replace(/á/g,'á').replace(/é/g,'é').replace(/ó/g,'ó')
+    .replace(/ö/g,'ö').replace(/ő/g,'ő').replace(/ü/g,'ü').replace(/ű/g,'ű')
+    .replace(/\s+/g, '').substring(0, 10);
+
+  return `
+    <div class="ugyfel-kartya ${penzClass}" onclick="ugyfelSzerkeszt('${u.id}')">
+      <div class="uk-header">
+        <div>
+          <div class="uk-nev">${u.nev}</div>
+          <div class="uk-tipus">${u.tipus || '—'}</div>
+        </div>
+        <span class="statusz-badge ${statuszClass}">${u.statusz || '—'}</span>
+      </div>
+      <div class="uk-info">
+        ${u.email ? `<div class="uk-info-sor">✉️ <span>${u.email}</span></div>` : ''}
+        ${u.telefon ? `<div class="uk-info-sor">📱 <span>${u.telefon}</span></div>` : ''}
+        ${u.albumId ? `<div class="uk-info-sor">📁 <span>${u.albumId}</span></div>` : ''}
+        ${u.datum ? `<div class="uk-info-sor">📅 <span>${u.datum}</span></div>` : ''}
+      </div>
+      ${teljes > 0 ? `
+      <div class="uk-penzugyek">
+        <div class="uk-osszeg">
+          <div class="label">Teljes</div>
+          <div class="ertek">${teljes.toLocaleString('hu-HU')} Ft</div>
+        </div>
+        <div class="uk-osszeg">
+          <div class="label">Befizetve</div>
+          <div class="ertek">${befizetve.toLocaleString('hu-HU')} Ft</div>
+        </div>
+        <div class="uk-osszeg">
+          <div class="label">Egyenleg</div>
+          <div class="ertek ${egyenleg > 0 ? 'pozitiv' : 'nulla'}">${egyenleg.toLocaleString('hu-HU')} Ft</div>
+        </div>
+      </div>` : ''}
+      ${u.tennivalo ? `<div class="uk-tennivalo">⚡ ${u.tennivalo}</div>` : ''}
+    </div>`;
+}
+
+function ugyfelBefizetek(u) {
+  return befizetek.filter(b => b.ugyfelId === u.id);
+}
+function ugyfelBefizetve(u) {
+  return ugyfelBefizetek(u).reduce((s, b) => s + b.osszeg, 0);
+}
+function ugyfelTeljes(u) {
+  return u.alapdij + (pluszRendeles[u.email] || 0);
+}
+function ugyfelEgyenleg(u) {
+  return ugyfelTeljes(u) - ugyfelBefizetve(u);
+}
+
+function statisztikakFrissit() {
+  const aktiv = ugyfelek.filter(u => u.statusz && u.statusz !== 'Lezárva').length;
+  const kintlevo = ugyfelek.reduce((s, u) => s + Math.max(0, ugyfelEgyenleg(u)), 0);
+  const befolyt = befizetek.reduce((s, b) => s + b.osszeg, 0);
+
+  document.getElementById('stat-osszes').textContent = ugyfelek.length;
+  document.getElementById('stat-aktiv').textContent = aktiv;
+  document.getElementById('stat-kintlevo').textContent = kintlevo.toLocaleString('hu-HU') + ' Ft';
+  document.getElementById('stat-befolyt').textContent = befolyt.toLocaleString('hu-HU') + ' Ft';
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function ujUgyfelModal() {
+  aktualisUgyfelId = null;
+  aktualisBefizetek = [];
+  document.getElementById('modal-cim').textContent = 'Új ügyfél';
+  document.getElementById('torles-btn').style.display = 'none';
+  document.getElementById('penzugyek-szekció').style.display = 'none';
+
+  // Form reset
+  ['f-nev','f-email','f-telefon','f-album','f-tennivalo','f-megjegyzes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-alapdij').value = '';
+  document.getElementById('f-datum').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-statusz').value = beallitasok.statuszok[0] || '';
+
+  document.getElementById('ugyfel-modal').classList.add('aktiv');
+}
+
+function ugyfelSzerkeszt(id) {
+  const u = ugyfelek.find(x => x.id === id);
+  if (!u) return;
+
+  aktualisUgyfelId = id;
+  aktualisBefizetek = [...ugyfelBefizetek(u)];
+
+  document.getElementById('modal-cim').textContent = u.nev;
+  document.getElementById('torles-btn').style.display = 'block';
+  document.getElementById('penzugyek-szekció').style.display = 'block';
+
+  document.getElementById('f-nev').value = u.nev;
+  document.getElementById('f-email').value = u.email;
+  document.getElementById('f-telefon').value = u.telefon;
+  document.getElementById('f-csatorna').value = u.csatorna;
+  document.getElementById('f-tipus').value = u.tipus;
+  document.getElementById('f-statusz').value = u.statusz;
+  document.getElementById('f-album').value = u.albumId;
+  document.getElementById('f-alapdij').value = u.alapdij || '';
+  document.getElementById('f-datum').value = u.datum;
+  document.getElementById('f-tennivalo').value = u.tennivalo;
+  document.getElementById('f-megjegyzes').value = u.megjegyzes;
+
+  befizetesListaFrissit(u);
+  document.getElementById('ugyfel-modal').classList.add('aktiv');
+}
+
+function befizetesListaFrissit(u) {
+  const lista = document.getElementById('befizetes-lista');
+  if (aktualisBefizetek.length === 0) {
+    lista.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:0.5rem 0">Még nincs rögzített befizetés.</div>';
+  } else {
+    lista.innerHTML = aktualisBefizetek.map((b, i) => `
+      <div class="befizetes-sor">
+        <div class="b-bal">
+          <div class="b-datum">${b.datum}</div>
+          <div>${b.megjegyzes || ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <div>
+            <div class="b-osszeg">${b.osszeg.toLocaleString('hu-HU')} Ft</div>
+            <div class="b-mod">${b.mod}</div>
+          </div>
+          <button class="b-torles" onclick="befizetesTorol(${i})">✕</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Összesítő frissítés
+  const befizetve = aktualisBefizetek.reduce((s, b) => s + b.osszeg, 0);
+  const alapdij = parseFloat(document.getElementById('f-alapdij').value) || 0;
+  const plusz = u ? (pluszRendeles[u.email] || 0) : 0;
+  const teljes = alapdij + plusz;
+  const egyenleg = teljes - befizetve;
+
+  document.getElementById('po-teljes').textContent = teljes.toLocaleString('hu-HU') + ' Ft';
+  document.getElementById('po-befizetve').textContent = befizetve.toLocaleString('hu-HU') + ' Ft';
+  document.getElementById('po-egyenleg').textContent = egyenleg.toLocaleString('hu-HU') + ' Ft';
+  document.getElementById('po-egyenleg').style.color = egyenleg > 0 ? 'var(--danger)' : 'var(--accent)';
+}
+
+function befizetesHozzaad() {
+  const datum = document.getElementById('b-datum').value;
+  const osszeg = parseFloat(document.getElementById('b-osszeg').value) || 0;
+  const mod = document.getElementById('b-mod').value;
+
+  if (!datum || osszeg <= 0) {
+    alert('Kérjük add meg a dátumot és az összeget!');
+    return;
+  }
+
+  aktualisBefizetek.push({
+    id: 'b_' + Date.now(),
+    ugyfelId: aktualisUgyfelId || '',
+    datum, osszeg, mod, megjegyzes: ''
+  });
+
+  document.getElementById('b-datum').value = '';
+  document.getElementById('b-osszeg').value = '';
+
+  const u = ugyfelek.find(x => x.id === aktualisUgyfelId);
+  befizetesListaFrissit(u);
+}
+
+function befizetesTorol(i) {
+  aktualisBefizetek.splice(i, 1);
+  const u = ugyfelek.find(x => x.id === aktualisUgyfelId);
+  befizetesListaFrissit(u);
+}
+
+function modalBezar(id) {
+  document.getElementById(id).classList.remove('aktiv');
+}
+
+// ============================================================
+// MENTÉS (Sheets-be írás webhook-on keresztül)
+// ============================================================
+async function ugyfelMent() {
+  const nev = document.getElementById('f-nev').value.trim();
+  if (!nev) { alert('A név kötelező!'); return; }
+
+  const ugyfel = {
+    id: aktualisUgyfelId || ('u_' + Date.now()),
+    nev,
+    email: document.getElementById('f-email').value.trim(),
+    telefon: document.getElementById('f-telefon').value.trim(),
+    csatorna: document.getElementById('f-csatorna').value,
+    tipus: document.getElementById('f-tipus').value,
+    statusz: document.getElementById('f-statusz').value,
+    tennivalo: document.getElementById('f-tennivalo').value.trim(),
+    albumId: document.getElementById('f-album').value.trim(),
+    alapdij: parseFloat(document.getElementById('f-alapdij').value) || 0,
+    datum: document.getElementById('f-datum').value,
+    megjegyzes: document.getElementById('f-megjegyzes').value.trim(),
+  };
+
+  if (CONFIG.webhookUrl) {
+    try {
+      const params = new URLSearchParams({
+        action: aktualisUgyfelId ? 'update' : 'create',
+        ugyfel: JSON.stringify(ugyfel),
+        befizetek: JSON.stringify(aktualisBefizetek),
+      });
+      fetch(CONFIG.webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    } catch(e) {}
+  }
+
+  // Lokális frissítés
+  if (aktualisUgyfelId) {
+    const idx = ugyfelek.findIndex(x => x.id === aktualisUgyfelId);
+    if (idx >= 0) ugyfelek[idx] = ugyfel;
+    befizetek = befizetek.filter(b => b.ugyfelId !== aktualisUgyfelId);
+    befizetek.push(...aktualisBefizetek.map(b => ({...b, ugyfelId: ugyfel.id})));
+  } else {
+    ugyfelek.push(ugyfel);
+    befizetek.push(...aktualisBefizetek.map(b => ({...b, ugyfelId: ugyfel.id})));
+  }
+
+  modalBezar('ugyfel-modal');
+  listaFrissit();
+  statisztikakFrissit();
+  alert('✅ Mentve! Ne felejtsd el a Sheets-be is rögzíteni ha nincs webhook beállítva.');
+}
+
+async function ugyfelTorol() {
+  if (!confirm('Biztosan törlöd ezt az ügyfelet?')) return;
+  ugyfelek = ugyfelek.filter(u => u.id !== aktualisUgyfelId);
+  befizetek = befizetek.filter(b => b.ugyfelId !== aktualisUgyfelId);
+  modalBezar('ugyfel-modal');
+  listaFrissit();
+  statisztikakFrissit();
+}
+
+// ESC = modal bezár
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
+});
+</script>
+</body>
+</html>
