@@ -1013,11 +1013,10 @@ async function ugyfelMent() {
 
   if (CONFIG.webhookUrl) {
     try {
-      const params = new URLSearchParams({
-        action: aktualisUgyfelId ? 'update' : 'create',
-        ugyfel: JSON.stringify(ugyfel),
-        befizetek: JSON.stringify(aktualisBefizetek),
-      });
+      const params = new URLSearchParams();
+      params.append('action', aktualisUgyfelId ? 'update' : 'create');
+      params.append('ugyfel', JSON.stringify(ugyfel));
+      params.append('befizetek', JSON.stringify(aktualisBefizetek));
       fetch(CONFIG.webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
     } catch(e) {}
   }
