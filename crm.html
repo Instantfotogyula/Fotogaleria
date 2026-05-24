@@ -637,7 +637,7 @@ body {
 const CONFIG = {
   crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
   apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbzt-VzsMEZFNC-pS1UH1YeUK3pfn8OZ1kwZ--Ekkav8UPEDmeYYCeU4m98tWyKgeUMm/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbyiGJPdDavQTGQeR-byfhusmAaU-fmo16dE94A904Pxn84y980Tq-hEVPGi11kkeygZ/exec',
 };
 
 // ============================================================
@@ -1065,7 +1065,7 @@ async function emlekeztetoFuttat() {
   btn.innerHTML = '<span class="icon">⏳</span> Futtatás...';
   
   try {
-    const crmWebhook = 'https://script.google.com/macros/s/AKfycbzt-VzsMEZFNC-pS1UH1YeUK3pfn8OZ1kwZ--Ekkav8UPEDmeYYCeU4m98tWyKgeUMm/exec';
+    const crmWebhook = CONFIG.webhookUrl;
     const params = new URLSearchParams({ action: 'emlekezteto' });
     await fetch(crmWebhook + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
     alert('✅ Emlékeztetők ellenőrizve! Ha volt évforduló, email érkezett.');
