@@ -451,6 +451,9 @@ body {
       <div class="nav-item" onclick="nezet('dashboard')">
         <span class="icon">📊</span> Áttekintő
       </div>
+      <div class="nav-item" onclick="emlekeztetoFuttat()">
+        <span class="icon">🔔</span> Emlékeztetők
+      </div>
     </nav>
     <div class="sidebar-bottom">
       <button class="sync-btn" onclick="adatokBetolt()">
@@ -1054,6 +1057,24 @@ async function ugyfelTorol() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
 });
+
+// EMLÉKEZTETŐ FUTTATÁS
+async function emlekeztetoFuttat() {
+  const btn = document.querySelector('.nav-item:nth-child(3)');
+  const eredeti = btn.innerHTML;
+  btn.innerHTML = '<span class="icon">⏳</span> Futtatás...';
+  
+  try {
+    const crmWebhook = 'https://script.google.com/macros/s/AKfycbzt-VzsMEZFNC-pS1UH1YeUK3pfn8OZ1kwZ--Ekkav8UPEDmeYYCeU4m98tWyKgeUMm/exec';
+    const params = new URLSearchParams({ action: 'emlekezteto' });
+    await fetch(crmWebhook + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    alert('✅ Emlékeztetők ellenőrizve! Ha volt évforduló, email érkezett.');
+  } catch(e) {
+    alert('Hiba történt: ' + e.message);
+  }
+  
+  btn.innerHTML = eredeti;
+}
 </script>
 </body>
 </html>
