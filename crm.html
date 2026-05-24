@@ -634,8 +634,7 @@ body {
 const CONFIG = {
   crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
   apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  // Apps Script webhook a CRM írásához (külön kell beállítani!)
-  webhookUrl: '',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbzt-VzsMEZFNC-pS1UH1YeUK3pfn8OZ1kwZ--Ekkav8UPEDmeYYCeU4m98tWyKgeUMm/exec',
 };
 
 // ============================================================
@@ -1037,7 +1036,7 @@ async function ugyfelMent() {
   modalBezar('ugyfel-modal');
   listaFrissit();
   statisztikakFrissit();
-  alert('✅ Mentve! Ne felejtsd el a Sheets-be is rögzíteni ha nincs webhook beállítva.');
+  // Sikeres mentés
 }
 
 async function ugyfelTorol() {
