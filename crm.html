@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface2: #22263a;
-  --border: #2e3248;
-  --accent: #4ade80;
-  --accent2: #f59e0b;
-  --accent3: #60a5fa;
-  --danger: #f87171;
-  --text: #e8eaf0;
-  --muted: #6b7280;
+  --bg: #f5ede0;
+  --surface: #fdf6ee;
+  --surface2: #eedfd0;
+  --border: #d9c4b0;
+  --accent: #5c3d2e;
+  --accent2: #9c6644;
+  --accent3: #7a4f3a;
+  --danger: #a83232;
+  --text: #2c1a0e;
+  --muted: #8a6f5e;
   --font: 'DM Sans', sans-serif;
   --serif: 'DM Serif Display', serif;
   --mono: 'DM Mono', monospace;
@@ -121,7 +121,7 @@ body {
   border: none;
   transition: all 0.15s;
 }
-.btn-primary { background: var(--accent); color: #0f1117; }
+.btn-primary { background: var(--accent); color: #fdf6ee; }
 .btn-primary:hover { opacity: 0.9; }
 .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
@@ -178,9 +178,9 @@ body {
 }
 .stat-label { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
-.stat-value.green { color: var(--accent); }
-.stat-value.amber { color: var(--accent2); }
-.stat-value.red { color: var(--danger); }
+.stat-value.green { color: #3a6b3a; }
+.stat-value.amber { color: #9c6644; }
+.stat-value.red { color: #a83232; }
 
 /* CONTENT */
 .content { flex: 1; overflow-y: auto; padding: 1.5rem; }
@@ -277,6 +277,7 @@ body {
   overflow-y: auto;
 }
 .modal-overlay.aktiv { display: flex; }
+.modal { box-shadow: 0 8px 32px rgba(44,26,14,0.15); }
 .modal {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -391,16 +392,16 @@ body {
 .po-ertek { font-family: var(--mono); font-weight: 700; font-size: 1rem; }
 
 /* STATUSZ SZINEK */
-.s-megkereses { background: rgba(107,114,128,0.2); color: #9ca3af; }
-.s-egyeztetes { background: rgba(96,165,250,0.2); color: #60a5fa; }
-.s-lefoglalva { background: rgba(167,139,250,0.2); color: #a78bfa; }
-.s-lefotózva { background: rgba(251,191,36,0.2); color: #fbbf24; }
-.s-valogatásra { background: rgba(251,146,60,0.2); color: #fb923c; }
-.s-retusálás { background: rgba(239,68,68,0.2); color: #ef4444; }
-.s-rendeles { background: rgba(34,197,94,0.2); color: #22c55e; }
-.s-fizetes { background: rgba(20,184,166,0.2); color: #14b8a6; }
-.s-atadva { background: rgba(74,222,128,0.2); color: #4ade80; }
-.s-lezarva { background: rgba(107,114,128,0.15); color: #6b7280; }
+.s-megkereses { background: rgba(92,61,46,0.1); color: #5c3d2e; }
+.s-egyeztetes { background: rgba(58,107,200,0.15); color: #2d5fa8; }
+.s-lefoglalva { background: rgba(120,60,160,0.12); color: #7a3ca0; }
+.s-lefotózva { background: rgba(156,102,68,0.15); color: #7a4020; }
+.s-valogatásra { background: rgba(180,90,30,0.15); color: #904020; }
+.s-retusálás { background: rgba(168,50,50,0.15); color: #a83232; }
+.s-rendeles { background: rgba(40,120,60,0.15); color: #2a7040; }
+.s-fizetes { background: rgba(20,130,120,0.15); color: #156b65; }
+.s-atadva { background: rgba(40,140,60,0.15); color: #287840; }
+.s-lezarva { background: rgba(92,61,46,0.08); color: #8a6f5e; }
 
 .form-actions {
   display: flex;
@@ -422,6 +423,7 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
