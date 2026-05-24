@@ -760,6 +760,9 @@ function listaFrissit() {
   const tipus = document.getElementById('filter-tipus')?.value || '';
   const penzugy = document.getElementById('filter-penzugy')?.value || '';
 
+  // ABC sorrend
+  ugyfelek.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+
   let szurt = ugyfelek.filter(u => {
     if (search && !u.nev.toLowerCase().includes(search) && !u.email.toLowerCase().includes(search)) return false;
     if (statusz && u.statusz !== statusz) return false;
