@@ -375,6 +375,9 @@ body {
   grid-template-columns: 1fr 1fr 1fr auto;
   gap: 0.5rem;
   align-items: end;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* PÉNZÜGYI ÖSSZESÍTŐ */
@@ -467,9 +470,14 @@ body {
     flex-direction: column !important;
   }
   
-  /* Befizetes form mobilon - egy oszlop */
-  .befizetes-form { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
-  .befizetes-form .form-group:last-child { grid-column: 1 / -1; }
+  /* Befizetes form mobilon */
+  .befizetes-form { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 0.4rem;
+    padding: 0.5rem;
+  }
+  /* Dátum teljes sor */
+  .befizetes-form .form-group:first-child { grid-column: 1 / -1; }
   
   /* Befizetés sorok mobilon */
   .befizetes-sor { flex-wrap: wrap; gap: 0.4rem; }
