@@ -637,7 +637,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 const CONFIG = {
   crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
   apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbz-xJh8WrzIRzo0FfvCaB003ble8NSPcy06wyx8J0IOyGUx_hAhembyEA-UhpnRt4TM/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbxvDS2raS8BlYbVH4otkCt9kzf2NE3amP1SnejfukvxxFDuTHFTzczjJGA0_sWQyfu8/exec',
 };
 
 // ============================================================
@@ -664,7 +664,7 @@ window.addEventListener('load', () => {
 
 async function adatokBetolt() {
   try {
-    await Promise.all([beallitasokBetolt(), ugyfelekBetolt(), befizetesBetolt(), tennivalokBetolt()]);
+    await Promise.all([beallitasokBetolt(), ugyfelekBetolt(), befizetesBetolt(), tennivalokBetolt(), elozményekBetolt()]);
     filterekFeltolt();
     foOldalFrissit();
   } catch(e) {
@@ -704,6 +704,16 @@ async function befizetesBetolt() {
     id: r[0]||'', ugyfelId: r[1]||'', datum: r[2]||'',
     osszeg: parseFloat(r[3])||0, mod: r[4]||'', megjegyzes: r[5]||'',
   }));
+}
+
+async function elozményekBetolt() {
+  try {
+    const rows = await sheetsOlvas('Fotózások!A2:E500');
+    window.elozmenyek = rows.filter(r => r[0]).map(r => ({
+      id: r[0]||'', ugyfelId: r[1]||'', datum: r[2]||'',
+      tipus: r[3]||'', osszeg: parseFloat(r[4])||0,
+    }));
+  } catch(e) { window.elozmenyek = []; }
 }
 
 async function tennivalokBetolt() {
@@ -761,9 +771,20 @@ function filterekFeltolt() {
   const checkboxDiv = document.getElementById('f-tipus-checkboxok');
   if (checkboxDiv) {
     checkboxDiv.innerHTML = beallitasok.tipusok.map(t => `
-      <label class="tipus-checkbox" onclick="tipusCheckboxToggle(this)">
+      <label class="tipus-checkbox">
         <input type="checkbox" value="${t}"> ${t}
       </label>`).join('');
+    
+    // Event listener minden checkboxra
+    checkboxDiv.querySelectorAll('.tipus-checkbox').forEach(label => {
+      label.addEventListener('click', function(e) {
+        const cb = this.querySelector('input');
+        if (e.target !== cb) {
+          cb.checked = !cb.checked;
+        }
+        this.classList.toggle('aktiv', cb.checked);
+      });
+    });
   }
   document.getElementById('f-tennivalo-select').innerHTML = '<option value="">— Válassz —</option>' + beallitasok.tennivaloTipusok.map(t => `<option>${t}</option>`).join('');
   // Tennivaló modal ügyfél lista
@@ -890,17 +911,16 @@ function ugyfelSzerkeszt(id) {
 }
 
 function tipusCheckboxToggle(label) {
-  label.classList.toggle('aktiv');
-  const cb = label.querySelector('input');
-  cb.checked = !cb.checked;
+  // handled by event listener
 }
 
 function tipusokBeallít(tipusStr) {
+  const tipusok = tipusStr ? tipusStr.split(',').map(t => t.trim()) : [];
   document.querySelectorAll('#f-tipus-checkboxok .tipus-checkbox').forEach(label => {
-    const val = label.querySelector('input').value;
-    const aktiv = tipusStr && tipusStr.split(',').map(t => t.trim()).includes(val);
+    const cb = label.querySelector('input');
+    const aktiv = tipusok.includes(cb.value);
+    cb.checked = aktiv;
     label.classList.toggle('aktiv', aktiv);
-    label.querySelector('input').checked = aktiv;
   });
 }
 
@@ -919,28 +939,26 @@ function elozmenySzekcionFrissit(u) {
   const lista = document.getElementById('elozmenyek-lista');
   if (!szekció || !lista) return;
 
-  // Az ügyfél összes befizetése = előzmény
-  const bef = ugyfelBefizetek(u);
+  const elozmenyek = (window.elozmenyek || []).filter(e => e.ugyfelId === u.id);
   
-  if (bef.length === 0) {
+  if (elozmenyek.length === 0) {
     szekció.style.display = 'none';
     return;
   }
   
   szekció.style.display = 'block';
   
-  // Befizetési előzmények megjelenítése
-  lista.innerHTML = bef.map(b => `
+  lista.innerHTML = elozmenyek.map(e => `
     <div class="elozmeny-sor">
       <div class="elozmeny-bal">
-        <div class="elozmeny-tipus">${u.tipus || '—'}</div>
-        <div class="elozmeny-datum">${b.datum || 'Ismeretlen dátum'} • ${b.mod || ''}</div>
+        <div class="elozmeny-tipus">${e.tipus || '—'}</div>
+        <div class="elozmeny-datum">${e.datum || '—'}</div>
       </div>
-      <div class="elozmeny-osszeg">${b.osszeg.toLocaleString('hu-HU')} Ft</div>
+      <div class="elozmeny-osszeg">${(e.osszeg||0).toLocaleString('hu-HU')} Ft</div>
     </div>`).join('');
   
-  const osszes = bef.reduce((s, b) => s + b.osszeg, 0);
-  document.getElementById('elozmeny-db').textContent = bef.length;
+  const osszes = elozmenyek.reduce((s, e) => s + (e.osszeg||0), 0);
+  document.getElementById('elozmeny-db').textContent = elozmenyek.length;
   document.getElementById('elozmeny-osszeg').textContent = osszes.toLocaleString('hu-HU') + ' Ft';
 }
 
@@ -1000,6 +1018,23 @@ async function ugyfelMent() {
     megjegyzes: document.getElementById('f-megjegyzes').value.trim(),
     hatarido: document.getElementById('f-hatarido').value,
   };
+
+  // Ha státusz "Lezárva" → előzmény naplózás
+  const regiUgyfel = ugyfelek.find(x => x.id === aktualisUgyfelId);
+  const regiStatusz = regiUgyfel ? regiUgyfel.statusz : '';
+  if (ugyfel.statusz === 'Lezárva' && regiStatusz !== 'Lezárva') {
+    const elozmeny = {
+      id: 'eloz_' + Date.now(),
+      ugyfelId: ugyfel.id,
+      datum: new Date().toISOString().split('T')[0],
+      tipus: ugyfel.tipus,
+      osszeg: ugyfel.alapdij,
+    };
+    webhookKuld({ action: 'elozmeny_create', elozmeny: JSON.stringify(elozmeny) });
+    // Lokálisan tároljuk
+    if (!window.elozmenyek) window.elozmenyek = [];
+    window.elozmenyek.push(elozmeny);
+  }
 
   // Ha van tennivaló és határidő → auto tennivaló létrehozás
   if (ugyfel.tennivalo && ugyfel.hatarido) {
