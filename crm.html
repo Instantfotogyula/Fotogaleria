@@ -445,22 +445,28 @@ body {
   .ugyfel-kartya { max-width: 100%; overflow: hidden; }
   .uk-info-sor { overflow: hidden; text-overflow: ellipsis; }
   
-  /* Modal teljes szélesség mobilon */
+  /* Modal mobilon */
   .modal-overlay { padding: 0; align-items: flex-end; }
-  .modal { border-radius: 1.5rem 1.5rem 0 0; max-height: 92vh; width: 100%; overflow-x: hidden; }
+  .modal { 
+    border-radius: 1.5rem 1.5rem 0 0; 
+    max-height: 92vh; 
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  
+  /* Minden elem max szélesség */
+  .form-grid, .befizetes-form, .penzugyi-ossz, .befizetes-lista { 
+    max-width: 100%;
+    overflow: hidden;
+  }
   
   /* Befizetes form mobilon - egy oszlop */
-  .befizetes-form { grid-template-columns: 1fr; gap: 0.4rem; }
-  
-  /* Pénzügyi összesítő mobilon */
-  .penzugyi-ossz { grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
-  .po-ertek { font-size: 0.85rem; }
+  .befizetes-form { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
   
   /* Befizetés sorok mobilon */
   .befizetes-sor { flex-wrap: wrap; gap: 0.4rem; }
-  
-  /* Form mezők mobilon */
-  .form-input, .form-select, .form-textarea { font-size: 16px; } /* 16px iOS zoom ellen */
   
   /* Topbar mobilon */
   .topbar-actions .btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
