@@ -611,6 +611,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="form-grid">
       <div class="form-group full"><label class="form-label">Feladat *</label><input type="text" class="form-input" id="tv-feladat" placeholder="pl. Visszahívni, Linket küldeni..."></div>
       <div class="form-group"><label class="form-label">Határidő *</label><input type="date" class="form-input" id="tv-hatarido"></div>
+      <div class="form-group"><label class="form-label">Időpont *</label><input type="time" class="form-input" id="tv-idopont" value="09:00"></div>
       <div class="form-group"><label class="form-label">Ügyfél (opcionális)</label><select class="form-select" id="tv-ugyfel"><option value="">— Nincs ügyfél —</option></select></div>
       <div class="form-group full"><label class="form-label">Megjegyzés</label><input type="text" class="form-input" id="tv-megjegyzes" placeholder="..."></div>
     </div>
@@ -629,7 +630,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 const CONFIG = {
   crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
   apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbxXuYwl2CgecfHFCHe9GAs390nmizjiDead0_Qll3HNQfddRjg8Hn-ftMAUdckKg4SV/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbxJDoAv-6nG1ekLBHbaQkVY8Qw94I018IcubCjrCubXWjccd_7xS7cj8R2i3rs9ssbS/exec',
 };
 
 // ============================================================
@@ -714,6 +715,7 @@ async function tennivalokBetolt() {
     tennivalok = rows.filter(r => r[0]).map(r => ({
       id: r[0]||'', feladat: r[1]||'', hatarido: r[2]||'',
       ugyfelId: r[3]||'', megjegyzes: r[4]||'', kesz: r[5]==='igen',
+      idopont: r[6]||'09:00',
     }));
   } catch(e) { tennivalok = []; }
 }
@@ -1156,7 +1158,10 @@ function naptarNapKattint(datum) {
         <div class="tv-check ${t.kesz?'kesz':''}" onclick="event.stopPropagation();${t.id.startsWith('u_')?'':"tennivaloToggle('" + t.id + "')"}">${t.kesz?'✓':''}</div>
         <div class="tv-tartalom">
           <div class="tv-feladat">${t.feladat}</div>
-          ${u?`<div class="tv-meta"><span class="tv-ugyfel">👤 ${u.nev}</span></div>`:''}
+          <div class="tv-meta">
+            ${t.idopont?`<span class="tv-datum">🕐 ${t.idopont}</span>`:''}
+            ${u?`<span class="tv-ugyfel">👤 ${u.nev}</span>`:''}
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -1168,6 +1173,7 @@ function naptarNapKattint(datum) {
 
 function ujTennivaloModalDatum() {
   document.getElementById('tv-hatarido').value = kivalasztottDatum || '';
+  document.getElementById('tv-idopont').value = '09:00';
   document.getElementById('tv-feladat').value = '';
   document.getElementById('tv-ugyfel').value = '';
   document.getElementById('tv-megjegyzes').value = '';
@@ -1227,9 +1233,9 @@ function ujTennivaloModal() {
   document.getElementById('tv-torles-btn').style.display = 'none';
   document.getElementById('tv-feladat').value = '';
   document.getElementById('tv-hatarido').value = '';
+  document.getElementById('tv-idopont').value = '09:00';
   document.getElementById('tv-ugyfel').value = '';
   document.getElementById('tv-megjegyzes').value = '';
-  // Frissítjük az ügyfél listát
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
   document.getElementById('tennivalo-modal').classList.add('aktiv');
 }
@@ -1242,6 +1248,7 @@ function tennivaloSzerkeszt(id) {
   document.getElementById('tv-torles-btn').style.display = 'block';
   document.getElementById('tv-feladat').value = t.feladat;
   document.getElementById('tv-hatarido').value = t.hatarido;
+  document.getElementById('tv-idopont').value = t.idopont || '09:00';
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
   document.getElementById('tv-ugyfel').value = t.ugyfelId;
   document.getElementById('tv-megjegyzes').value = t.megjegyzes;
@@ -1253,9 +1260,10 @@ async function tennivaloMent() {
   const hatarido = document.getElementById('tv-hatarido').value;
   if (!feladat) { alert('A feladat megadása kötelező!'); return; }
 
+  const idopont = document.getElementById('tv-idopont').value || '09:00';
   const tv = {
     id: aktualisTvId || ('tv_'+Date.now()),
-    feladat, hatarido,
+    feladat, hatarido, idopont,
     ugyfelId: document.getElementById('tv-ugyfel').value,
     megjegyzes: document.getElementById('tv-megjegyzes').value.trim(),
     kesz: false,
