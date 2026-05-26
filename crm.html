@@ -470,14 +470,18 @@ body {
     flex-direction: column !important;
   }
   
-  /* Befizetes form mobilon */
+  /* Befizetes form mobilon - 2x2 rács */
   .befizetes-form { 
     grid-template-columns: 1fr 1fr; 
     gap: 0.4rem;
     padding: 0.5rem;
+    overflow: hidden;
   }
-  /* Dátum teljes sor */
-  .befizetes-form .form-group:first-child { grid-column: 1 / -1; }
+  /* Minden elem belefér */
+  .befizetes-form .form-group { min-width: 0; }
+  .befizetes-form .form-input,
+  .befizetes-form .form-select,
+  .befizetes-form .btn { width: 100%; box-sizing: border-box; }
   
   /* Befizetés sorok mobilon */
   .befizetes-sor { flex-wrap: wrap; gap: 0.4rem; }
