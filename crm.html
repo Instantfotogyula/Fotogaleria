@@ -446,20 +446,25 @@ body {
   .uk-info-sor { overflow: hidden; text-overflow: ellipsis; }
   
   /* Modal mobilon */
-  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal-overlay { 
+    padding: 0; 
+    align-items: flex-end;
+    overflow: hidden;
+  }
   .modal { 
     border-radius: 1.5rem 1.5rem 0 0; 
     max-height: 92vh; 
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
     overflow-x: hidden;
     box-sizing: border-box;
   }
   
-  /* Minden elem max szélesség */
-  .form-grid, .befizetes-form, .penzugyi-ossz, .befizetes-lista { 
-    max-width: 100%;
-    overflow: hidden;
+  /* Tennivaló sor egymás alá mobilon */
+  #f-tennivalo-select, #f-tennivalo {
+    width: 100%;
+  }
+  .form-group.full > div[style*="display:flex"] {
+    flex-direction: column !important;
   }
   
   /* Befizetes form mobilon - egy oszlop */
@@ -470,6 +475,9 @@ body {
   
   /* Topbar mobilon */
   .topbar-actions .btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+  
+  /* Scrollbar elrejtése mobilon */
+  ::-webkit-scrollbar { display: none; }
 
   /* Alsó navigáció mobilon */
   .mobile-nav { display: flex !important; }
