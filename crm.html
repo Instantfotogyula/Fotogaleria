@@ -91,16 +91,22 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   z-index: 50;
 }
 .back-btn {
-  background: none;
-  border: none;
-  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--accent);
   cursor: pointer;
   font-size: 1.1rem;
-  padding: 0.25rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+  font-family: var(--font);
+  transition: all 0.15s;
+  white-space: nowrap;
 }
-.back-btn:hover { color: var(--accent); }
+.back-btn:hover { background: var(--border); }
 .topbar h2 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; flex: 1; }
 .topbar-actions { display: flex; gap: 0.5rem; }
 
@@ -277,9 +283,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .search-input::placeholder { color: var(--muted); }
 
 /* ========== MODAL ========== */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.aktiv { display: flex; }
-.modal { background: var(--surface); border-radius: 1.5rem 1.5rem 0 0; width: 100%; max-width: 680px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 -4px 32px rgba(44,26,14,0.15); }
+.modal { background: var(--surface); border-radius: 1rem; width: 100%; max-width: 680px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(44,26,14,0.2); position: relative; cursor: default; }
+.modal-header { cursor: move; user-select: none; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
 .modal-header h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; }
 .modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 0.25rem; }
@@ -351,7 +358,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   .fo-gomb .fo-sub { display: none; }
   .ugyfel-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
-  .modal { border-radius: 1.25rem 1.25rem 0 0; padding: 1rem; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal { border-radius: 1.25rem 1.25rem 0 0; padding: 1rem; max-height: 92vh; }
+  .modal-header { cursor: default; }
   .befizetes-form { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
   .befizetes-form .form-group:nth-child(1) { grid-column: 1 / -1; }
   .befizetes-form .form-group:nth-child(4) { grid-column: 2; }
@@ -410,7 +419,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 <!-- ========== ÜGYFELEK NÉZET ========== -->
 <div class="app" id="app-ugyfelek">
   <div class="topbar">
-    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <button class="back-btn" onclick="visszaFooldal()">← Főoldal</button>
     <h2>👥 Ügyfelek</h2>
     <div class="topbar-actions">
       <button class="btn btn-primary" onclick="ujUgyfelModal()">+ Új</button>
@@ -442,7 +451,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 <!-- ========== NAPTÁR NÉZET ========== -->
 <div class="app" id="app-naptar">
   <div class="topbar">
-    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <button class="back-btn" onclick="visszaFooldal()">← Főoldal</button>
     <h2>📅 Naptár</h2>
     <div class="topbar-actions">
       <button class="btn btn-primary" onclick="ujTennivaloModal()">+ Feladat</button>
@@ -472,7 +481,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 <!-- ========== TENNIVALÓK NÉZET ========== -->
 <div class="app" id="app-tennivalok">
   <div class="topbar">
-    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <button class="back-btn" onclick="visszaFooldal()">← Főoldal</button>
     <h2>✅ Tennivalók</h2>
     <div class="topbar-actions">
       <select class="filter-select" id="tv-filter" onchange="tennivalokMegjeleint()">
@@ -1133,9 +1142,43 @@ async function emlekeztetoFuttat() {
 }
 
 // ============================================================
-// MODAL
+// MODAL + DRAG
 // ============================================================
 function modalBezar(id) { document.getElementById(id).classList.remove('aktiv'); }
+
+// Mozgatható modal asztali gépen
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.modal').forEach(modal => {
+    const header = modal.querySelector('.modal-header');
+    if (!header) return;
+    let isDragging = false, startX, startY, startLeft, startTop;
+    
+    header.addEventListener('mousedown', e => {
+      if (window.innerWidth <= 768) return;
+      isDragging = true;
+      const rect = modal.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = rect.left;
+      startTop = rect.top;
+      modal.style.position = 'fixed';
+      modal.style.margin = '0';
+      modal.style.left = startLeft + 'px';
+      modal.style.top = startTop + 'px';
+      e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      modal.style.left = (startLeft + dx) + 'px';
+      modal.style.top = (startTop + dy) + 'px';
+    });
+    
+    document.addEventListener('mouseup', () => { isDragging = false; });
+  });
+});
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
 });
