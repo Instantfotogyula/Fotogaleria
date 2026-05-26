@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Instantfoto CRM</title>
+<title>InstantFoto CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -424,11 +424,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 <!-- ========== FŐOLDAL ========== -->
 <div id="fooldal">
   <div class="fo-logo">
-    <h1>Instantfoto</h1>
+    <h1>InstantFoto</h1>
     <p>CRM rendszer</p>
   </div>
 
-  <div class="fo-gombok">
+  <div class="fo-gombok" style="grid-template-columns:1fr 1fr;max-width:400px">
     <div class="fo-gomb" onclick="nezetMegnyit('ugyfelek')">
       <div class="fo-icon">👥</div>
       <div class="fo-label">Ügyfelek</div>
@@ -437,11 +437,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="fo-gomb" onclick="nezetMegnyit('naptar')">
       <div class="fo-icon">📅</div>
       <div class="fo-label">Naptár</div>
-      <div class="fo-sub">Feladatok időben</div>
-    </div>
-    <div class="fo-gomb" onclick="nezetMegnyit('tennivalok')">
-      <div class="fo-icon">✅</div>
-      <div class="fo-label">Tennivalók</div>
       <div class="fo-sub" id="fo-tennivalo-szam">— feladat</div>
     </div>
   </div>
@@ -458,6 +453,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="fo-stat">
       <div class="fo-stat-ertek" id="fo-befolyt" style="color:#3a6b3a">—</div>
       <div class="fo-stat-label">Befolyt</div>
+    </div>
+    <div class="fo-stat">
+      <div class="fo-stat-ertek" id="fo-nyitott-tv" style="color:var(--accent2)">—</div>
+      <div class="fo-stat-label">Nyitott feladat</div>
     </div>
   </div>
 </div>
@@ -498,9 +497,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 <div class="app" id="app-naptar">
   <div class="topbar">
     <button class="back-btn" onclick="visszaFooldal()">← Főoldal</button>
-    <h2>📅 Naptár</h2>
+    <h2>📅 Naptár & Tennivalók</h2>
     <div class="topbar-actions">
-      <button class="btn btn-primary" onclick="ujTennivaloModal()">+ Feladat</button>
+      <button class="btn btn-secondary" onclick="adatokBetolt()">🔄</button>
+      <button class="btn btn-secondary" onclick="emlekeztetoFuttat()">🔔</button>
     </div>
   </div>
   <div class="content" style="overflow-y:auto">
@@ -533,25 +533,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   </div>
 </div>
 
-<!-- ========== TENNIVALÓK NÉZET ========== -->
-<div class="app" id="app-tennivalok">
-  <div class="topbar">
-    <button class="back-btn" onclick="visszaFooldal()">← Főoldal</button>
-    <h2>✅ Tennivalók</h2>
-    <div class="topbar-actions">
-      <select class="filter-select" id="tv-filter" onchange="tennivalokMegjeleint()">
-        <option value="aktiv">Aktív</option>
-        <option value="mind">Összes</option>
-        <option value="kesedelmes">Késedelmes</option>
-        <option value="kesz">Kész</option>
-      </select>
-    </div>
-  </div>
-  <div class="content" id="tennivalo-content">
-    <div class="loading"><div class="loading-spinner"></div><p>Betöltés...</p></div>
-  </div>
-  <button class="uj-tennivalo-btn" onclick="ujTennivaloModal()">+</button>
-</div>
+<!-- Tennivalók nézet beolvadt a Naptárba -->
 
 <!-- ========== ÜGYFÉL MODAL ========== -->
 <div class="modal-overlay" id="ugyfel-modal">
@@ -749,6 +731,7 @@ function foOldalFrissit() {
   document.getElementById('fo-befolyt').textContent = befolyt.toLocaleString('hu-HU') + ' Ft';
   const aktivTv = tennivalok.filter(t => !t.kesz).length;
   document.getElementById('fo-tennivalo-szam').textContent = aktivTv + ' feladat';
+  document.getElementById('fo-nyitott-tv').textContent = aktivTv;
 }
 
 function nezetMegnyit(nev) {
@@ -757,7 +740,6 @@ function nezetMegnyit(nev) {
   document.getElementById('app-' + nev).classList.add('aktiv');
   if (nev === 'ugyfelek') szures();
   if (nev === 'naptar') naptarRajzol();
-  if (nev === 'tennivalok') tennivalokMegjeleint();
 }
 
 function visszaFooldal() {
