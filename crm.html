@@ -430,9 +430,64 @@ body {
   .form-grid { grid-template-columns: 1fr; }
   .befizetes-form { grid-template-columns: 1fr 1fr; }
   .ugyfel-grid { grid-template-columns: 1fr; }
-  .stats-bar { gap: 1rem; flex-wrap: wrap; }
+  .stats-bar { gap: 0.75rem; flex-wrap: wrap; }
   .penzugyi-ossz { grid-template-columns: 1fr; }
+  
+  /* Mobilon fix szélesség */
+  .app { flex-direction: column; }
+  .main { width: 100%; overflow-x: hidden; }
+  .content { padding: 0.75rem; padding-bottom: 5rem; }
+  .topbar { padding: 0.75rem 1rem; }
+  .filters { padding: 0.5rem 0.75rem; }
+  .stats-bar { padding: 0.5rem 0.75rem; }
+  
+  /* Ügyfélkártya nem lóg ki */
+  .ugyfel-kartya { max-width: 100%; overflow: hidden; }
+  .uk-info-sor { overflow: hidden; text-overflow: ellipsis; }
+  
+  /* Modal teljes szélesség mobilon */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal { border-radius: 1.5rem 1.5rem 0 0; max-height: 92vh; }
+  
+  /* Befizetes form mobilon */
+  .befizetes-form { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+
+  /* Alsó navigáció mobilon */
+  .mobile-nav { display: flex !important; }
 }
+
+/* Alsó mobilnavigáció */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0;
+  z-index: 50;
+  justify-content: space-around;
+  align-items: center;
+}
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.65rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.15s;
+}
+.mobile-nav-btn .mn-icon { font-size: 1.3rem; }
+.mobile-nav-btn.aktiv { color: var(--accent); }
+.mobile-nav-btn:hover { color: var(--text); }
 </style>
 </head>
 <body>
@@ -629,6 +684,26 @@ body {
     </div>
   </div>
 </div>
+
+<!-- MOBIL NAVIGÁCIÓ -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn aktiv" onclick="mobileNezet('ugyfelek', this)">
+    <span class="mn-icon">👥</span>
+    Ügyfelek
+  </button>
+  <button class="mobile-nav-btn" onclick="ujUgyfelModal()">
+    <span class="mn-icon">➕</span>
+    Új ügyfél
+  </button>
+  <button class="mobile-nav-btn" onclick="mobileNezet('sync', this)">
+    <span class="mn-icon">🔄</span>
+    Szinkron
+  </button>
+  <button class="mobile-nav-btn" onclick="emlekeztetoFuttat()">
+    <span class="mn-icon">🔔</span>
+    Emlékeztető
+  </button>
+</nav>
 
 <script>
 // ============================================================
@@ -1057,6 +1132,17 @@ async function ugyfelTorol() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
 });
+
+// MOBIL NAVIGÁCIÓ
+function mobileNezet(n, btn) {
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('aktiv'));
+  if (btn) btn.classList.add('aktiv');
+  if (n === 'sync') {
+    adatokBetolt();
+  } else {
+    listaFrissit();
+  }
+}
 
 // EMLÉKEZTETŐ FUTTATÁS
 async function emlekeztetoFuttat() {
