@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Instantfoto CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -23,174 +23,114 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; overflow-x: hidden; }
 
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
+/* ========== FŐOLDAL ========== */
+#fooldal {
   min-height: 100vh;
-  font-size: 14px;
-}
-
-/* LAYOUT */
-.app { display: flex; height: 100vh; overflow: hidden; }
-
-/* SIDEBAR */
-.sidebar {
-  width: 220px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-}
-.sidebar-logo {
-  padding: 1.5rem 1.25rem 1rem;
-  border-bottom: 1px solid var(--border);
-}
-.sidebar-logo h1 {
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--accent);
-  font-weight: 400;
-}
-.sidebar-logo p { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
-
-.sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
-.nav-item {
-  display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.15s;
-  margin-bottom: 2px;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  gap: 2rem;
 }
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.aktiv { background: var(--surface2); color: var(--accent); }
-.nav-item .icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+.fo-logo { text-align: center; }
+.fo-logo h1 { font-family: var(--serif); font-size: 2.5rem; color: var(--accent); font-weight: 400; }
+.fo-logo p { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; font-family: var(--mono); }
 
-.sidebar-bottom {
-  padding: 1rem 0.75rem;
-  border-top: 1px solid var(--border);
-}
-.sync-btn {
+.fo-gombok {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
   width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  font-family: var(--font);
-  font-size: 0.8rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.15s;
+  max-width: 600px;
 }
-.sync-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-/* MAIN */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-/* TOPBAR */
-.topbar {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.fo-gomb {
   background: var(--surface);
-  flex-shrink: 0;
-}
-.topbar h2 { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; }
-.topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
-
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-family: var(--font);
-  font-size: 0.82rem;
-  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 1rem;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  text-align: center;
 }
-.btn-primary { background: var(--accent); color: #fdf6ee; }
-.btn-primary:hover { opacity: 0.9; }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.fo-gomb:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(92,61,46,0.15); }
+.fo-gomb .fo-icon { font-size: 2.5rem; }
+.fo-gomb .fo-label { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+.fo-gomb .fo-sub { font-size: 0.72rem; color: var(--muted); }
 
-/* FILTERS */
+.fo-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.fo-stat { text-align: center; }
+.fo-stat-ertek { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+.fo-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+/* ========== ALAP LAYOUT ========== */
+.app { display: none; flex-direction: column; min-height: 100vh; }
+.app.aktiv { display: flex; }
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+.back-btn:hover { color: var(--accent); }
+.topbar h2 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; flex: 1; }
+.topbar-actions { display: flex; gap: 0.5rem; }
+
+/* ========== ÜGYFELEK NÉZET ========== */
 .filters {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   gap: 0.5rem;
-  align-items: center;
   flex-wrap: wrap;
   background: var(--surface);
   flex-shrink: 0;
 }
-.filter-select {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.4rem;
-  font-family: var(--font);
-  font-size: 0.8rem;
-  cursor: pointer;
-  outline: none;
-}
-.filter-select:focus { border-color: var(--accent); }
-.search-input {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.4rem;
-  font-family: var(--font);
-  font-size: 0.8rem;
-  outline: none;
-  width: 200px;
-}
-.search-input:focus { border-color: var(--accent); }
-.search-input::placeholder { color: var(--muted); }
-
-/* STATS */
 .stats-bar {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   display: flex;
   gap: 1.5rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.stat-label { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
-.stat-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.stat-label { font-size: 0.65rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; }
+.stat-value { font-size: 1rem; font-weight: 700; }
 .stat-value.green { color: #3a6b3a; }
-.stat-value.amber { color: #9c6644; }
-.stat-value.red { color: #a83232; }
+.stat-value.amber { color: var(--accent2); }
+.stat-value.red { color: var(--danger); }
 
-/* CONTENT */
-.content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+.content { flex: 1; overflow-y: auto; padding: 1rem; padding-bottom: 1rem; }
 
-/* ÜGYFÉL LISTA */
-.ugyfel-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
-}
+.ugyfel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
 
 .ugyfel-kartya {
   background: var(--surface);
@@ -199,521 +139,399 @@ body {
   padding: 1.25rem;
   cursor: pointer;
   transition: all 0.15s;
-  position: relative;
 }
 .ugyfel-kartya:hover { border-color: var(--accent); transform: translateY(-1px); }
 .ugyfel-kartya.kintlevo { border-left: 3px solid var(--danger); }
-.ugyfel-kartya.fizetve { border-left: 3px solid var(--accent); }
+.ugyfel-kartya.fizetve { border-left: 3px solid #3a6b3a; }
 .ugyfel-kartya.reszben { border-left: 3px solid var(--accent2); }
 
-.uk-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.uk-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; }
 .uk-nev { font-weight: 600; font-size: 0.95rem; }
 .uk-tipus { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+.statusz-badge { font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 2rem; font-family: var(--mono); white-space: nowrap; }
 
-.statusz-badge {
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  border-radius: 2rem;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
+.uk-info { margin-bottom: 0.6rem; }
+.uk-info-sor { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.2rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uk-info-sor span { color: var(--text); overflow: hidden; text-overflow: ellipsis; }
 
-.uk-info { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; }
-.uk-info-sor { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--muted); }
-.uk-info-sor span { color: var(--text); }
-
-.uk-penzugyek {
-  background: var(--surface2);
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.uk-osszeg { font-family: var(--mono); font-size: 0.82rem; }
-.uk-osszeg .label { color: var(--muted); font-size: 0.7rem; }
-.uk-osszeg .ertek { font-weight: 600; }
+.uk-penzugyek { background: var(--surface2); border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; justify-content: space-between; }
+.uk-osszeg .label { color: var(--muted); font-size: 0.65rem; }
+.uk-osszeg .ertek { font-family: var(--mono); font-weight: 600; font-size: 0.82rem; }
 .uk-osszeg .ertek.pozitiv { color: var(--danger); }
-.uk-osszeg .ertek.nulla { color: var(--accent); }
+.uk-osszeg .ertek.nulla { color: #3a6b3a; }
+.uk-tennivalo { margin-top: 0.5rem; font-size: 0.75rem; color: var(--accent2); }
+.uk-hatarido { font-size: 0.7rem; color: var(--danger); font-family: var(--mono); }
 
-.uk-tennivalo {
-  margin-top: 0.6rem;
-  font-size: 0.75rem;
-  color: var(--accent2);
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
+/* ========== NAPTÁR ========== */
+.naptar-wrap { padding: 1rem; }
+.naptar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.naptar-nav h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; }
+.naptar-nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+.naptar-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* LOADING */
-.loading {
-  text-align: center;
-  padding: 4rem;
-  color: var(--muted);
-}
-.loading-spinner {
-  width: 32px; height: 32px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 1rem;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* MODAL */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 100;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
-}
-.modal-overlay.aktiv { display: flex; }
-.modal { box-shadow: 0 8px 32px rgba(44,26,14,0.15); }
-.modal {
+.naptar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.naptar-fejlec { text-align: center; font-size: 0.7rem; font-weight: 600; color: var(--muted); padding: 0.4rem 0; font-family: var(--mono); }
+.naptar-nap {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 1rem;
-  width: 100%;
-  max-width: 680px;
-  padding: 1.5rem;
-  position: relative;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-}
-.modal-header h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; }
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 1.2rem;
+  border-radius: 0.4rem;
+  min-height: 70px;
+  padding: 0.3rem;
   cursor: pointer;
-  padding: 0.25rem;
+  transition: all 0.1s;
+  overflow: hidden;
 }
-.modal-close:hover { color: var(--text); }
-
-/* FORM */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-.form-group.full { grid-column: 1 / -1; }
-.form-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
-.form-input, .form-select, .form-textarea {
+.naptar-nap:hover { border-color: var(--accent2); }
+.naptar-nap.ma { border-color: var(--accent); border-width: 2px; }
+.naptar-nap.ures { background: transparent; border-color: transparent; cursor: default; }
+.naptar-nap.masik-honap { opacity: 0.4; }
+.nap-szam { font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+.naptar-nap.ma .nap-szam { color: var(--accent); }
+.nap-esemeny {
+  font-size: 0.62rem;
   background: var(--surface2);
-  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1px 3px;
+  margin-bottom: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text);
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.5rem;
-  font-family: var(--font);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.15s;
+  cursor: pointer;
+}
+.nap-esemeny.ugyfel { background: rgba(92,61,46,0.12); color: var(--accent); }
+.nap-esemeny.sajat { background: rgba(156,102,68,0.15); color: var(--accent2); }
+
+/* ========== TENNIVALÓK ========== */
+.tennivalok-wrap { padding: 1rem; }
+.tennivalo-sor {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tennivalo-sor:hover { border-color: var(--accent); }
+.tennivalo-sor.kesedelmes { border-left: 3px solid var(--danger); }
+.tennivalo-sor.mai { border-left: 3px solid var(--accent2); }
+.tennivalo-sor.kovetkező { border-left: 3px solid #3a6b3a; }
+.tennivalo-sor.kesz { opacity: 0.5; }
+.tv-check {
+  width: 1.2rem; height: 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.15s;
+}
+.tv-check:hover { border-color: var(--accent); }
+.tv-check.kesz { background: #3a6b3a; border-color: #3a6b3a; color: white; }
+.tv-tartalom { flex: 1; min-width: 0; }
+.tv-feladat { font-weight: 500; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-meta { display: flex; gap: 0.5rem; align-items: center; margin-top: 2px; flex-wrap: wrap; }
+.tv-ugyfel { font-size: 0.72rem; color: var(--muted); }
+.tv-datum { font-size: 0.7rem; font-family: var(--mono); }
+.tv-datum.kesedelmes { color: var(--danger); font-weight: 600; }
+.tv-datum.mai { color: var(--accent2); font-weight: 600; }
+
+.uj-tennivalo-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  width: 3.5rem; height: 3.5rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(92,61,46,0.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  z-index: 40;
+}
+.uj-tennivalo-btn:hover { transform: scale(1.05); }
+
+/* ========== GOMBOK ========== */
+.btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-family: var(--font); font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: var(--surface); }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: rgba(168,50,50,0.1); color: var(--danger); border: 1px solid rgba(168,50,50,0.2); }
+
+/* ========== FILTEREK ========== */
+.filter-select, .search-input {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  padding: 0.35rem 0.75rem; border-radius: 0.4rem; font-family: var(--font); font-size: 0.8rem; outline: none;
+}
+.filter-select:focus, .search-input:focus { border-color: var(--accent); }
+.search-input { width: 180px; }
+.search-input::placeholder { color: var(--muted); }
+
+/* ========== MODAL ========== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; }
+.modal-overlay.aktiv { display: flex; }
+.modal { background: var(--surface); border-radius: 1.5rem 1.5rem 0 0; width: 100%; max-width: 680px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 -4px 32px rgba(44,26,14,0.15); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+.modal-header h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 0.25rem; }
+
+/* ========== FORM ========== */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-input, .form-select, .form-textarea {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  padding: 0.55rem 0.75rem; border-radius: 0.5rem; font-family: var(--font); font-size: 0.85rem; outline: none;
+  width: 100%; box-sizing: border-box;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
-.form-textarea { resize: vertical; min-height: 80px; }
-.form-select option { background: var(--surface2); }
+.form-textarea { resize: vertical; min-height: 70px; }
+.form-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.form-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem; font-weight: 600; }
 
-.form-section {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--border);
-}
-.form-section-title {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-/* BEFIZETÉS LISTA */
-.befizetes-lista { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
-.befizetes-sor {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.82rem;
-}
-.befizetes-sor .b-bal { display: flex; flex-direction: column; gap: 2px; }
-.befizetes-sor .b-datum { color: var(--muted); font-size: 0.72rem; font-family: var(--mono); }
-.befizetes-sor .b-osszeg { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+/* ========== BEFIZETÉS ========== */
+.befizetes-lista { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
+.befizetes-sor { background: var(--surface2); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; flex-wrap: wrap; gap: 0.3rem; }
+.befizetes-sor .b-bal { display: flex; flex-direction: column; gap: 1px; }
+.befizetes-sor .b-datum { color: var(--muted); font-size: 0.7rem; font-family: var(--mono); }
+.befizetes-sor .b-osszeg { font-family: var(--mono); font-weight: 600; color: #3a6b3a; }
 .befizetes-sor .b-mod { font-size: 0.7rem; color: var(--muted); }
-.befizetes-sor .b-torles {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 0.9rem;
-  padding: 0.2rem;
-}
+.befizetes-sor .b-torles { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; }
 .befizetes-sor .b-torles:hover { color: var(--danger); }
 
 .befizetes-form {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 0.5rem;
-  align-items: end;
-  box-sizing: border-box;
-  width: 100%;
-  overflow: hidden;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.75rem;
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.5rem; align-items: end;
+  width: 100%; box-sizing: border-box;
 }
 
-/* PÉNZÜGYI ÖSSZESÍTŐ */
-.penzugyi-ossz {
-  background: var(--surface2);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
+.penzugyi-ossz { background: var(--surface2); border-radius: 0.5rem; padding: 0.6rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
 .po-item { text-align: center; }
-.po-label { font-size: 0.65rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; margin-bottom: 4px; }
-.po-ertek { font-family: var(--mono); font-weight: 700; font-size: 1rem; }
+.po-label { font-size: 0.6rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; margin-bottom: 3px; }
+.po-ertek { font-family: var(--mono); font-weight: 700; font-size: 0.9rem; }
 
-/* STATUSZ SZINEK */
-.s-megkereses { background: rgba(92,61,46,0.1); color: #5c3d2e; }
-.s-egyeztetes { background: rgba(58,107,200,0.15); color: #2d5fa8; }
+.form-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
+
+/* ========== STÁTUSZ SZÍNEK ========== */
+.s-megkeresés,.s-megkereses { background: rgba(92,61,46,0.1); color: #5c3d2e; }
+.s-egyeztetés,.s-egyeztetes { background: rgba(58,107,200,0.15); color: #2d5fa8; }
+.s-árajánlat,.s-arajanalt { background: rgba(100,60,160,0.12); color: #6a3ca0; }
 .s-lefoglalva { background: rgba(120,60,160,0.12); color: #7a3ca0; }
-.s-lefotózva { background: rgba(156,102,68,0.15); color: #7a4020; }
-.s-valogatásra { background: rgba(180,90,30,0.15); color: #904020; }
-.s-retusálás { background: rgba(168,50,50,0.15); color: #a83232; }
-.s-rendeles { background: rgba(40,120,60,0.15); color: #2a7040; }
-.s-fizetes { background: rgba(20,130,120,0.15); color: #156b65; }
-.s-atadva { background: rgba(40,140,60,0.15); color: #287840; }
-.s-lezarva { background: rgba(92,61,46,0.08); color: #8a6f5e; }
+.s-lefotózva,.s-lefotózva { background: rgba(156,102,68,0.15); color: #7a4020; }
+.s-válogatásra,.s-valogtasra { background: rgba(180,90,30,0.15); color: #904020; }
+.s-retusálás,.s-retusalas { background: rgba(168,50,50,0.15); color: var(--danger); }
+.s-rendelés,.s-rendeles { background: rgba(40,120,60,0.15); color: #2a7040; }
+.s-fizetés,.s-fizetes { background: rgba(20,130,120,0.15); color: #156b65; }
+.s-átadva,.s-atadva { background: rgba(40,140,60,0.15); color: #287840; }
+.s-lezárva,.s-lezarva { background: rgba(92,61,46,0.08); color: var(--muted); }
 
-.form-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
+/* ========== LOADING ========== */
+.loading { text-align: center; padding: 3rem; color: var(--muted); }
+.loading-spinner { width: 30px; height: 30px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 3rem; color: var(--muted); }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 
-.btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
-.btn-danger:hover { background: rgba(248,113,113,0.25); }
-
-/* ÜRES ÁLLAPOT */
-.empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
-
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-
+/* ========== MOBIL ========== */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .form-grid { grid-template-columns: 1fr; }
-  .befizetes-form { grid-template-columns: 1fr 1fr; }
+  .fo-gombok { grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+  .fo-gomb { padding: 1.25rem 0.5rem; border-radius: 0.75rem; }
+  .fo-gomb .fo-icon { font-size: 1.8rem; }
+  .fo-gomb .fo-label { font-size: 0.8rem; }
+  .fo-gomb .fo-sub { display: none; }
   .ugyfel-grid { grid-template-columns: 1fr; }
-  .stats-bar { gap: 0.75rem; flex-wrap: wrap; }
-  .penzugyi-ossz { grid-template-columns: 1fr; }
-  
-  /* Mobilon fix szélesség */
-  .app { flex-direction: column; }
-  .main { width: 100%; overflow-x: hidden; }
-  .content { padding: 0.75rem; padding-bottom: 5rem; }
-  .topbar { padding: 0.75rem 1rem; }
-  .filters { padding: 0.5rem 0.75rem; }
-  .stats-bar { padding: 0.5rem 0.75rem; }
-  
-  /* Ügyfélkártya nem lóg ki */
-  .ugyfel-kartya { max-width: 100%; overflow: hidden; }
-  .uk-info-sor { overflow: hidden; text-overflow: ellipsis; }
-  
-  /* Modal mobilon */
-  .modal-overlay { 
-    padding: 0; 
-    align-items: flex-end;
-    overflow: hidden;
-  }
-  .modal { 
-    border-radius: 1.5rem 1.5rem 0 0; 
-    max-height: 92vh; 
-    width: 100%;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-  
-  /* Tennivaló sor egymás alá mobilon */
-  #f-tennivalo-select, #f-tennivalo {
-    width: 100%;
-  }
-  .form-group.full > div[style*="display:flex"] {
-    flex-direction: column !important;
-  }
-  
-  /* Befizetes form mobilon - 2x2 rács */
-  .befizetes-form { 
-    grid-template-columns: 1fr 1fr; 
-    gap: 0.4rem;
-    padding: 0.5rem;
-    overflow: hidden;
-  }
-  /* Minden elem belefér */
-  .befizetes-form .form-group { min-width: 0; }
-  .befizetes-form .form-input,
-  .befizetes-form .form-select,
-  .befizetes-form .btn { width: 100%; box-sizing: border-box; }
-  
-  /* Befizetés sorok mobilon */
-  .befizetes-sor { flex-wrap: wrap; gap: 0.4rem; }
-  
-  /* Topbar mobilon */
-  .topbar-actions .btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
-  
-  /* Scrollbar elrejtése mobilon */
-  ::-webkit-scrollbar { display: none; }
-
-  /* Alsó navigáció mobilon */
-  .mobile-nav { display: flex !important; }
+  .form-grid { grid-template-columns: 1fr; }
+  .modal { border-radius: 1.25rem 1.25rem 0 0; padding: 1rem; }
+  .befizetes-form { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .befizetes-form .form-group:nth-child(1) { grid-column: 1 / -1; }
+  .befizetes-form .form-group:nth-child(4) { grid-column: 2; }
+  .befizetes-form .form-input, .befizetes-form .form-select, .befizetes-form .btn { width: 100%; box-sizing: border-box; }
+  .naptar-nap { min-height: 50px; }
+  .nap-esemeny { font-size: 0.55rem; }
+  .stats-bar { gap: 0.75rem; }
+  .fo-stats { gap: 1rem; }
+  .search-input { width: 140px; }
 }
-
-/* Alsó mobilnavigáció */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 0.5rem 0;
-  z-index: 50;
-  justify-content: space-around;
-  align-items: center;
-}
-.mobile-nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 0.4rem 0.75rem;
-  border: none;
-  background: none;
-  color: var(--muted);
-  font-family: var(--font);
-  font-size: 0.65rem;
-  cursor: pointer;
-  border-radius: 0.5rem;
-  transition: all 0.15s;
-}
-.mobile-nav-btn .mn-icon { font-size: 1.3rem; }
-.mobile-nav-btn.aktiv { color: var(--accent); }
-.mobile-nav-btn:hover { color: var(--text); }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <h1>Instantfoto</h1>
-      <p>CRM rendszer</p>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-item aktiv" onclick="nezet('ugyfelek')">
-        <span class="icon">👥</span> Ügyfelek
-      </div>
-      <div class="nav-item" onclick="nezet('dashboard')">
-        <span class="icon">📊</span> Áttekintő
-      </div>
-      <div class="nav-item" onclick="emlekeztetoFuttat()">
-        <span class="icon">🔔</span> Emlékeztetők
-      </div>
-    </nav>
-    <div class="sidebar-bottom">
-      <button class="sync-btn" onclick="adatokBetolt()">
-        <span id="sync-icon">🔄</span> Szinkronizálás
-      </button>
-    </div>
-  </aside>
+<!-- ========== FŐOLDAL ========== -->
+<div id="fooldal">
+  <div class="fo-logo">
+    <h1>Instantfoto</h1>
+    <p>CRM rendszer</p>
+  </div>
 
-  <!-- MAIN -->
-  <main class="main">
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <h2 id="nezet-cim">Ügyfelek</h2>
-      <div class="topbar-actions">
-        <button class="btn btn-primary" onclick="ujUgyfelModal()">+ Új ügyfél</button>
-      </div>
+  <div class="fo-gombok">
+    <div class="fo-gomb" onclick="nezetMegnyit('ugyfelek')">
+      <div class="fo-icon">👥</div>
+      <div class="fo-label">Ügyfelek</div>
+      <div class="fo-sub" id="fo-ugyfel-szam">— ügyfél</div>
     </div>
+    <div class="fo-gomb" onclick="nezetMegnyit('naptar')">
+      <div class="fo-icon">📅</div>
+      <div class="fo-label">Naptár</div>
+      <div class="fo-sub">Feladatok időben</div>
+    </div>
+    <div class="fo-gomb" onclick="nezetMegnyit('tennivalok')">
+      <div class="fo-icon">✅</div>
+      <div class="fo-label">Tennivalók</div>
+      <div class="fo-sub" id="fo-tennivalo-szam">— feladat</div>
+    </div>
+  </div>
 
-    <!-- FILTERS -->
-    <div class="filters" id="filters-bar">
-      <input type="text" class="search-input" id="search-input" placeholder="🔍 Keresés..." oninput="szures()">
-      <select class="filter-select" id="filter-statusz" onchange="szures()">
-        <option value="">Minden státusz</option>
-      </select>
-      <select class="filter-select" id="filter-tipus" onchange="szures()">
-        <option value="">Minden típus</option>
-      </select>
-      <select class="filter-select" id="filter-penzugy" onchange="szures()">
-        <option value="">Minden pénzügy</option>
-        <option value="kintlevo">Kintlévőség van</option>
-        <option value="fizetve">Teljesen fizetve</option>
-        <option value="reszben">Részben fizetve</option>
-      </select>
+  <div class="fo-stats">
+    <div class="fo-stat">
+      <div class="fo-stat-ertek" id="fo-aktiv">—</div>
+      <div class="fo-stat-label">Aktív ügyfelek</div>
     </div>
-
-    <!-- STATS -->
-    <div class="stats-bar" id="stats-bar">
-      <div class="stat">
-        <span class="stat-label">Összes ügyfél</span>
-        <span class="stat-value" id="stat-osszes">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Aktív</span>
-        <span class="stat-value amber" id="stat-aktiv">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Kintlévőség</span>
-        <span class="stat-value red" id="stat-kintlevo">—</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Befolyt</span>
-        <span class="stat-value green" id="stat-befolyt">—</span>
-      </div>
+    <div class="fo-stat">
+      <div class="fo-stat-ertek" id="fo-kintlevo" style="color:var(--danger)">—</div>
+      <div class="fo-stat-label">Kintlévőség</div>
     </div>
-
-    <!-- CONTENT -->
-    <div class="content" id="content">
-      <div class="loading"><div class="loading-spinner"></div><p>Adatok betöltése...</p></div>
+    <div class="fo-stat">
+      <div class="fo-stat-ertek" id="fo-befolyt" style="color:#3a6b3a">—</div>
+      <div class="fo-stat-label">Befolyt</div>
     </div>
-  </main>
+  </div>
 </div>
 
-<!-- ÚJ/SZERKESZTÉS MODAL -->
+<!-- ========== ÜGYFELEK NÉZET ========== -->
+<div class="app" id="app-ugyfelek">
+  <div class="topbar">
+    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <h2>👥 Ügyfelek</h2>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" onclick="ujUgyfelModal()">+ Új</button>
+      <button class="btn btn-secondary" onclick="adatokBetolt()">🔄</button>
+      <button class="btn btn-secondary" onclick="emlekeztetoFuttat()">🔔</button>
+    </div>
+  </div>
+  <div class="filters">
+    <input type="text" class="search-input" id="search-input" placeholder="🔍 Keresés..." oninput="szures()">
+    <select class="filter-select" id="filter-statusz" onchange="szures()"><option value="">Minden státusz</option></select>
+    <select class="filter-select" id="filter-tipus" onchange="szures()"><option value="">Minden típus</option></select>
+    <select class="filter-select" id="filter-penzugy" onchange="szures()">
+      <option value="">Minden pénzügy</option>
+      <option value="kintlevo">Kintlévőség van</option>
+      <option value="fizetve">Teljesen fizetve</option>
+    </select>
+  </div>
+  <div class="stats-bar">
+    <div><div class="stat-label">Összes</div><div class="stat-value" id="stat-osszes">—</div></div>
+    <div><div class="stat-label">Aktív</div><div class="stat-value amber" id="stat-aktiv">—</div></div>
+    <div><div class="stat-label">Kintlévőség</div><div class="stat-value red" id="stat-kintlevo">—</div></div>
+    <div><div class="stat-label">Befolyt</div><div class="stat-value green" id="stat-befolyt">—</div></div>
+  </div>
+  <div class="content" id="ugyfel-content">
+    <div class="loading"><div class="loading-spinner"></div><p>Betöltés...</p></div>
+  </div>
+</div>
+
+<!-- ========== NAPTÁR NÉZET ========== -->
+<div class="app" id="app-naptar">
+  <div class="topbar">
+    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <h2>📅 Naptár</h2>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" onclick="ujTennivaloModal()">+ Feladat</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="naptar-wrap">
+      <div class="naptar-nav">
+        <button class="naptar-nav-btn" onclick="naptarHonap(-1)">‹</button>
+        <h3 id="naptar-cim">—</h3>
+        <button class="naptar-nav-btn" onclick="naptarHonap(1)">›</button>
+      </div>
+      <div class="naptar-grid" id="naptar-fejlecek">
+        <div class="naptar-fejlec">H</div>
+        <div class="naptar-fejlec">K</div>
+        <div class="naptar-fejlec">Sze</div>
+        <div class="naptar-fejlec">Cs</div>
+        <div class="naptar-fejlec">P</div>
+        <div class="naptar-fejlec">Szo</div>
+        <div class="naptar-fejlec">V</div>
+      </div>
+      <div class="naptar-grid" id="naptar-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TENNIVALÓK NÉZET ========== -->
+<div class="app" id="app-tennivalok">
+  <div class="topbar">
+    <button class="back-btn" onclick="visszaFooldal()">←</button>
+    <h2>✅ Tennivalók</h2>
+    <div class="topbar-actions">
+      <select class="filter-select" id="tv-filter" onchange="tennivalokMegjeleint()">
+        <option value="aktiv">Aktív</option>
+        <option value="mind">Összes</option>
+        <option value="kesedelmes">Késedelmes</option>
+        <option value="kesz">Kész</option>
+      </select>
+    </div>
+  </div>
+  <div class="content" id="tennivalo-content">
+    <div class="loading"><div class="loading-spinner"></div><p>Betöltés...</p></div>
+  </div>
+  <button class="uj-tennivalo-btn" onclick="ujTennivaloModal()">+</button>
+</div>
+
+<!-- ========== ÜGYFÉL MODAL ========== -->
 <div class="modal-overlay" id="ugyfel-modal">
   <div class="modal">
     <div class="modal-header">
       <h3 id="modal-cim">Új ügyfél</h3>
       <button class="modal-close" onclick="modalBezar('ugyfel-modal')">✕</button>
     </div>
-
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Név *</label>
-        <input type="text" class="form-input" id="f-nev" placeholder="Kiss Anna">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="f-email" placeholder="kiss@gmail.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Telefon</label>
-        <input type="text" class="form-input" id="f-telefon" placeholder="+36 30 123 4567">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Csatorna</label>
-        <select class="form-select" id="f-csatorna"></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Fotózás típusa</label>
-        <select class="form-select" id="f-tipus"></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Státusz</label>
-        <select class="form-select" id="f-statusz"></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Album ID</label>
-        <input type="text" class="form-input" id="f-album" placeholder="album01">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Alapdíj (Ft)</label>
-        <input type="number" class="form-input" id="f-alapdij" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Dátum</label>
-        <input type="date" class="form-input" id="f-datum">
-      </div>
+      <div class="form-group"><label class="form-label">Név *</label><input type="text" class="form-input" id="f-nev" placeholder="Kiss Anna"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="f-email"></div>
+      <div class="form-group"><label class="form-label">Telefon</label><input type="text" class="form-input" id="f-telefon"></div>
+      <div class="form-group"><label class="form-label">Csatorna</label><select class="form-select" id="f-csatorna"></select></div>
+      <div class="form-group"><label class="form-label">Fotózás típusa</label><select class="form-select" id="f-tipus"></select></div>
+      <div class="form-group"><label class="form-label">Státusz</label><select class="form-select" id="f-statusz"></select></div>
+      <div class="form-group"><label class="form-label">Album ID</label><input type="text" class="form-input" id="f-album" placeholder="album01"></div>
+      <div class="form-group"><label class="form-label">Alapdíj (Ft)</label><input type="number" class="form-input" id="f-alapdij" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Fotózás dátuma</label><input type="date" class="form-input" id="f-datum"></div>
+      <div class="form-group"><label class="form-label">Határidő</label><input type="date" class="form-input" id="f-hatarido"></div>
       <div class="form-group full">
         <label class="form-label">Következő tennivaló</label>
-        <div style="display:flex;gap:0.5rem">
-          <select class="form-select" id="f-tennivalo-select" onchange="tennivaloValaszt()" style="flex:1">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <select class="form-select" id="f-tennivalo-select" onchange="tennivaloValaszt()" style="flex:1;min-width:140px">
             <option value="">— Válassz —</option>
           </select>
-          <input type="text" class="form-input" id="f-tennivalo" placeholder="vagy írj be egyedit..." style="flex:1">
+          <input type="text" class="form-input" id="f-tennivalo" placeholder="vagy írj be egyedit..." style="flex:1;min-width:140px">
         </div>
       </div>
-      <div class="form-group full">
-        <label class="form-label">Megjegyzés</label>
-        <textarea class="form-textarea" id="f-megjegyzes" placeholder="Bármilyen fontos info..."></textarea>
-      </div>
+      <div class="form-group full"><label class="form-label">Megjegyzés</label><textarea class="form-textarea" id="f-megjegyzes"></textarea></div>
     </div>
 
-    <!-- PÉNZÜGYEK -->
-    <div class="form-section" id="penzugyek-szekció">
+    <div class="form-section" id="penzugyek-szekció" style="display:none">
       <div class="form-section-title">💰 Pénzügyek</div>
-
       <div class="penzugyi-ossz">
-        <div class="po-item">
-          <div class="po-label">Teljes összeg</div>
-          <div class="po-ertek" id="po-teljes">— Ft</div>
-        </div>
-        <div class="po-item">
-          <div class="po-label">Befizetett</div>
-          <div class="po-ertek" style="color:var(--accent)" id="po-befizetve">0 Ft</div>
-        </div>
-        <div class="po-item">
-          <div class="po-label">Egyenleg</div>
-          <div class="po-ertek" id="po-egyenleg">— Ft</div>
-        </div>
+        <div class="po-item"><div class="po-label">Teljes</div><div class="po-ertek" id="po-teljes">— Ft</div></div>
+        <div class="po-item"><div class="po-label">Befizetve</div><div class="po-ertek" style="color:#3a6b3a" id="po-befizetve">0 Ft</div></div>
+        <div class="po-item"><div class="po-label">Egyenleg</div><div class="po-ertek" id="po-egyenleg">— Ft</div></div>
       </div>
-
       <div class="befizetes-lista" id="befizetes-lista"></div>
-
-      <!-- ÚJ BEFIZETÉS FORM -->
       <div class="befizetes-form">
-        <div class="form-group">
-          <label class="form-label">Dátum</label>
-          <input type="date" class="form-input" id="b-datum">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Összeg (Ft)</label>
-          <input type="number" class="form-input" id="b-osszeg" placeholder="0">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mód</label>
-          <select class="form-select" id="b-mod">
-            <option>Utalás</option>
-            <option>Készpénz</option>
-            <option>Kártya</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">&nbsp;</label>
-          <button class="btn btn-secondary" onclick="befizetesHozzaad()" style="white-space:nowrap">+ Hozzáad</button>
-        </div>
+        <div class="form-group"><label class="form-label">Dátum</label><input type="date" class="form-input" id="b-datum"></div>
+        <div class="form-group"><label class="form-label">Összeg (Ft)</label><input type="number" class="form-input" id="b-osszeg" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Mód</label><select class="form-select" id="b-mod"><option>Utalás</option><option>Készpénz</option><option>Kártya</option></select></div>
+        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-secondary" onclick="befizetesHozzaad()" style="width:100%">+ Hozzáad</button></div>
       </div>
     </div>
 
@@ -725,25 +543,26 @@ body {
   </div>
 </div>
 
-<!-- MOBIL NAVIGÁCIÓ -->
-<nav class="mobile-nav">
-  <button class="mobile-nav-btn aktiv" onclick="mobileNezet('ugyfelek', this)">
-    <span class="mn-icon">👥</span>
-    Ügyfelek
-  </button>
-  <button class="mobile-nav-btn" onclick="ujUgyfelModal()">
-    <span class="mn-icon">➕</span>
-    Új ügyfél
-  </button>
-  <button class="mobile-nav-btn" onclick="mobileNezet('sync', this)">
-    <span class="mn-icon">🔄</span>
-    Szinkron
-  </button>
-  <button class="mobile-nav-btn" onclick="emlekeztetoFuttat()">
-    <span class="mn-icon">🔔</span>
-    Emlékeztető
-  </button>
-</nav>
+<!-- ========== TENNIVALÓ MODAL ========== -->
+<div class="modal-overlay" id="tennivalo-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tv-modal-cim">Új feladat</h3>
+      <button class="modal-close" onclick="modalBezar('tennivalo-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Feladat *</label><input type="text" class="form-input" id="tv-feladat" placeholder="pl. Visszahívni, Linket küldeni..."></div>
+      <div class="form-group"><label class="form-label">Határidő *</label><input type="date" class="form-input" id="tv-hatarido"></div>
+      <div class="form-group"><label class="form-label">Ügyfél (opcionális)</label><select class="form-select" id="tv-ugyfel"><option value="">— Nincs ügyfél —</option></select></div>
+      <div class="form-group full"><label class="form-label">Megjegyzés</label><input type="text" class="form-input" id="tv-megjegyzes" placeholder="..."></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger" id="tv-torles-btn" onclick="tennivaloTorol()" style="display:none">Törlés</button>
+      <button class="btn btn-secondary" onclick="modalBezar('tennivalo-modal')">Mégse</button>
+      <button class="btn btn-primary" onclick="tennivaloMent()">Mentés</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ============================================================
@@ -760,228 +579,198 @@ const CONFIG = {
 // ============================================================
 let ugyfelek = [];
 let befizetek = [];
-let beallitasok = { tipusok: [], statuszok: [], csatornak: [], tennivalok: [] };
+let tennivalok = [];
+let beallitasok = { tipusok: [], statuszok: [], csatornak: [], tennivaloTipusok: [] };
 let aktualisUgyfelId = null;
 let aktualisBefizetek = [];
-let pluszRendeles = {}; // email → összeg (Rendelések Sheets-ből)
+let aktualisTvId = null;
+let naptarEv, naptarHonapIdx;
 
 // ============================================================
 // INDULÁS
 // ============================================================
-window.addEventListener('load', adatokBetolt);
+window.addEventListener('load', () => {
+  const ma = new Date();
+  naptarEv = ma.getFullYear();
+  naptarHonapIdx = ma.getMonth();
+  adatokBetolt();
+});
 
 async function adatokBetolt() {
-  document.getElementById('sync-icon').textContent = '⏳';
-  document.getElementById('content').innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Adatok betöltése...</p></div>';
-
   try {
-    await Promise.all([
-      beallitasokBetolt(),
-      ugyfelekBetolt(),
-      befizetesBetolt(),
-    ]);
+    await Promise.all([beallitasokBetolt(), ugyfelekBetolt(), befizetesBetolt(), tennivalokBetolt()]);
     filterekFeltolt();
-    listaFrissit();
-    statisztikakFrissit();
+    foOldalFrissit();
   } catch(e) {
-    document.getElementById('content').innerHTML = `<div class="empty-state"><div class="icon">😕</div><p>Betöltési hiba: ${e.message}</p><br><button class="btn btn-secondary" onclick="adatokBetolt()">Újra</button></div>`;
+    console.error('Betöltési hiba:', e);
   }
-  document.getElementById('sync-icon').textContent = '🔄';
 }
 
 async function sheetsOlvas(range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.crmSheetsId}/values/${encodeURIComponent(range)}?key=${CONFIG.apiKey}`;
   const r = await fetch(url);
-  if (!r.ok) throw new Error('Sheets API hiba: ' + r.status);
-  const d = await r.json();
-  return d.values || [];
+  if (!r.ok) throw new Error('Sheets hiba: ' + r.status);
+  return (await r.json()).values || [];
 }
 
 async function beallitasokBetolt() {
-  const rows = await sheetsOlvas('Beállítások!A1:G20');
+  const rows = await sheetsOlvas('Beállítások!A1:G30');
   beallitasok.tipusok = rows.slice(1).map(r => r[0]).filter(Boolean);
   beallitasok.statuszok = rows.slice(1).map(r => r[2]).filter(Boolean);
   beallitasok.csatornak = rows.slice(1).map(r => r[4]).filter(Boolean);
-  beallitasok.tennivalok = rows.slice(1).map(r => r[6]).filter(Boolean);
+  beallitasok.tennivaloTipusok = rows.slice(1).map(r => r[6]).filter(Boolean);
 }
 
 async function ugyfelekBetolt() {
-  const rows = await sheetsOlvas('Ügyfelek!A2:L200');
+  const rows = await sheetsOlvas('Ügyfelek!A2:M500');
   ugyfelek = rows.filter(r => r[0]).map(r => ({
-    id: r[0] || '',
-    nev: r[1] || '',
-    email: r[2] || '',
-    telefon: r[3] || '',
-    csatorna: r[4] || '',
-    tipus: r[5] || '',
-    statusz: r[6] || '',
-    tennivalo: r[7] || '',
-    albumId: r[8] || '',
-    alapdij: parseFloat(r[9]) || 0,
-    datum: r[10] || '',
-    megjegyzes: r[11] || '',
+    id: r[0]||'', nev: r[1]||'', email: r[2]||'', telefon: r[3]||'',
+    csatorna: r[4]||'', tipus: r[5]||'', statusz: r[6]||'',
+    tennivalo: r[7]||'', albumId: r[8]||'', alapdij: parseFloat(r[9])||0,
+    datum: r[10]||'', megjegyzes: r[11]||'', hatarido: r[12]||'',
   }));
+  ugyfelek.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
 }
 
 async function befizetesBetolt() {
-  const rows = await sheetsOlvas('Befizetések!A2:F500');
+  const rows = await sheetsOlvas('Befizetések!A2:F1000');
   befizetek = rows.filter(r => r[0]).map(r => ({
-    id: r[0] || '',
-    ugyfelId: r[1] || '',
-    datum: r[2] || '',
-    osszeg: parseFloat(r[3]) || 0,
-    mod: r[4] || '',
-    megjegyzes: r[5] || '',
+    id: r[0]||'', ugyfelId: r[1]||'', datum: r[2]||'',
+    osszeg: parseFloat(r[3])||0, mod: r[4]||'', megjegyzes: r[5]||'',
   }));
 }
 
-// ============================================================
-// UI
-// ============================================================
-function nezet(n) {
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('aktiv'));
-  event.currentTarget.classList.add('aktiv');
-  document.getElementById('nezet-cim').textContent = n === 'ugyfelek' ? 'Ügyfelek' : 'Áttekintő';
-  listaFrissit();
+async function tennivalokBetolt() {
+  try {
+    const rows = await sheetsOlvas('Tennivalók!A2:F500');
+    tennivalok = rows.filter(r => r[0]).map(r => ({
+      id: r[0]||'', feladat: r[1]||'', hatarido: r[2]||'',
+      ugyfelId: r[3]||'', megjegyzes: r[4]||'', kesz: r[5]==='igen',
+    }));
+  } catch(e) { tennivalok = []; }
 }
 
+// ============================================================
+// FŐOLDAL
+// ============================================================
+function foOldalFrissit() {
+  document.getElementById('fo-ugyfel-szam').textContent = ugyfelek.length + ' ügyfél';
+  const aktiv = ugyfelek.filter(u => u.statusz && u.statusz !== 'Lezárva').length;
+  document.getElementById('fo-aktiv').textContent = aktiv;
+  const kintlevo = ugyfelek.reduce((s, u) => s + Math.max(0, ugyfelEgyenleg(u)), 0);
+  document.getElementById('fo-kintlevo').textContent = kintlevo.toLocaleString('hu-HU') + ' Ft';
+  const befolyt = befizetek.reduce((s, b) => s + b.osszeg, 0);
+  document.getElementById('fo-befolyt').textContent = befolyt.toLocaleString('hu-HU') + ' Ft';
+  const aktivTv = tennivalok.filter(t => !t.kesz).length;
+  document.getElementById('fo-tennivalo-szam').textContent = aktivTv + ' feladat';
+}
+
+function nezetMegnyit(nev) {
+  document.getElementById('fooldal').style.display = 'none';
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('aktiv'));
+  document.getElementById('app-' + nev).classList.add('aktiv');
+  if (nev === 'ugyfelek') szures();
+  if (nev === 'naptar') naptarRajzol();
+  if (nev === 'tennivalok') tennivalokMegjeleint();
+}
+
+function visszaFooldal() {
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('aktiv'));
+  document.getElementById('fooldal').style.display = 'flex';
+  foOldalFrissit();
+}
+
+// ============================================================
+// ÜGYFELEK
+// ============================================================
 function filterekFeltolt() {
   const statSelect = document.getElementById('filter-statusz');
   const tipusSelect = document.getElementById('filter-tipus');
-  const fStatusz = document.getElementById('f-statusz');
-  const fTipus = document.getElementById('f-tipus');
-  const fCsatorna = document.getElementById('f-csatorna');
-
-  statSelect.innerHTML = '<option value="">Minden státusz</option>' +
-    beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
-  tipusSelect.innerHTML = '<option value="">Minden típus</option>' +
-    beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
-  fStatusz.innerHTML = beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
-  fTipus.innerHTML = beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
-  fCsatorna.innerHTML = beallitasok.csatornak.map(c => `<option>${c}</option>`).join('');
-  
-  // Tennivalók legördülő
-  const fTennivalo = document.getElementById('f-tennivalo-select');
-  if (fTennivalo) {
-    fTennivalo.innerHTML = '<option value="">— Válassz —</option>' +
-      beallitasok.tennivalok.map(t => `<option>${t}</option>`).join('');
-  }
+  statSelect.innerHTML = '<option value="">Minden státusz</option>' + beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
+  tipusSelect.innerHTML = '<option value="">Minden típus</option>' + beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
+  document.getElementById('f-statusz').innerHTML = beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
+  document.getElementById('f-tipus').innerHTML = beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
+  document.getElementById('f-csatorna').innerHTML = beallitasok.csatornak.map(c => `<option>${c}</option>`).join('');
+  document.getElementById('f-tennivalo-select').innerHTML = '<option value="">— Válassz —</option>' + beallitasok.tennivaloTipusok.map(t => `<option>${t}</option>`).join('');
+  // Tennivaló modal ügyfél lista
+  document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
 }
 
 function szures() {
-  listaFrissit();
-}
-
-function listaFrissit() {
-  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const statusz = document.getElementById('filter-statusz')?.value || '';
-  const tipus = document.getElementById('filter-tipus')?.value || '';
-  const penzugy = document.getElementById('filter-penzugy')?.value || '';
-
-  // ABC sorrend
-  ugyfelek.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+  const search = (document.getElementById('search-input')?.value||'').toLowerCase();
+  const statusz = document.getElementById('filter-statusz')?.value||'';
+  const tipus = document.getElementById('filter-tipus')?.value||'';
+  const penzugy = document.getElementById('filter-penzugy')?.value||'';
 
   let szurt = ugyfelek.filter(u => {
     if (search && !u.nev.toLowerCase().includes(search) && !u.email.toLowerCase().includes(search)) return false;
     if (statusz && u.statusz !== statusz) return false;
     if (tipus && u.tipus !== tipus) return false;
-    if (penzugy) {
-      const egyenleg = ugyfelEgyenleg(u);
-      if (penzugy === 'kintlevo' && egyenleg <= 0) return false;
-      if (penzugy === 'fizetve' && egyenleg !== 0) return false;
-      if (penzugy === 'reszben') {
-        const befiz = ugyfelBefizetve(u);
-        if (befiz === 0 || egyenleg <= 0) return false;
-      }
-    }
+    if (penzugy === 'kintlevo' && ugyfelEgyenleg(u) <= 0) return false;
+    if (penzugy === 'fizetve' && ugyfelEgyenleg(u) !== 0) return false;
     return true;
   });
 
-  const grid = document.getElementById('content');
+  // Stat frissítés
+  document.getElementById('stat-osszes').textContent = szurt.length;
+  document.getElementById('stat-aktiv').textContent = szurt.filter(u => u.statusz !== 'Lezárva').length;
+  const kintlevo = szurt.reduce((s, u) => s + Math.max(0, ugyfelEgyenleg(u)), 0);
+  document.getElementById('stat-kintlevo').textContent = kintlevo.toLocaleString('hu-HU') + ' Ft';
+  const befolyt = szurt.reduce((s, u) => s + ugyfelBefizetve(u), 0);
+  document.getElementById('stat-befolyt').textContent = befolyt.toLocaleString('hu-HU') + ' Ft';
 
+  const content = document.getElementById('ugyfel-content');
   if (szurt.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>Nincs találat</p></div>';
+    content.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>Nincs találat</p></div>';
     return;
   }
+  content.innerHTML = `<div class="ugyfel-grid">${szurt.map(u => ugyfelKartyaHTML(u)).join('')}</div>`;
+}
 
-  grid.innerHTML = `<div class="ugyfel-grid">${szurt.map(u => ugyfelKartyaHTML(u)).join('')}</div>`;
+function ugyfelBefizetek(u) { return befizetek.filter(b => b.ugyfelId === u.id); }
+function ugyfelBefizetve(u) { return ugyfelBefizetek(u).reduce((s, b) => s + b.osszeg, 0); }
+function ugyfelTeljes(u) { return u.alapdij; }
+function ugyfelEgyenleg(u) { return ugyfelTeljes(u) - ugyfelBefizetve(u); }
+
+function statuszClass(s) {
+  if (!s) return '';
+  return 's-' + s.toLowerCase()
+    .replace(/á/g,'á').replace(/é/g,'é').replace(/ő/g,'ő').replace(/ó/g,'ó')
+    .replace(/ü/g,'ü').replace(/ű/g,'ű').replace(/ö/g,'ö').replace(/í/g,'í')
+    .replace(/\s+/g,'').substring(0,12);
 }
 
 function ugyfelKartyaHTML(u) {
   const befizetve = ugyfelBefizetve(u);
   const teljes = ugyfelTeljes(u);
   const egyenleg = teljes - befizetve;
-  
-  let penzClass = '';
-  if (egyenleg > 0 && befizetve > 0) penzClass = 'reszben';
-  else if (egyenleg > 0) penzClass = 'kintlevo';
-  else if (teljes > 0) penzClass = 'fizetve';
+  let penzClass = egyenleg > 0 && befizetve > 0 ? 'reszben' : egyenleg > 0 ? 'kintlevo' : teljes > 0 ? 'fizetve' : '';
 
-  const statuszClass = 's-' + (u.statusz || '').toLowerCase()
-    .replace(/á/g,'á').replace(/é/g,'é').replace(/ó/g,'ó')
-    .replace(/ö/g,'ö').replace(/ő/g,'ő').replace(/ü/g,'ü').replace(/ű/g,'ű')
-    .replace(/\s+/g, '').substring(0, 10);
+  const ma = new Date().toISOString().split('T')[0];
+  const hatarido = u.hatarido && u.hatarido < ma ? '⚠️ ' + u.hatarido : u.hatarido || '';
 
-  return `
-    <div class="ugyfel-kartya ${penzClass}" onclick="ugyfelSzerkeszt('${u.id}')">
-      <div class="uk-header">
-        <div>
-          <div class="uk-nev">${u.nev}</div>
-          <div class="uk-tipus">${u.tipus || '—'}</div>
-        </div>
-        <span class="statusz-badge ${statuszClass}">${u.statusz || '—'}</span>
-      </div>
-      <div class="uk-info">
-        ${u.email ? `<div class="uk-info-sor">✉️ <span>${u.email}</span></div>` : ''}
-        ${u.telefon ? `<div class="uk-info-sor">📱 <span>${u.telefon}</span></div>` : ''}
-        ${u.albumId ? `<div class="uk-info-sor">📁 <span>${u.albumId}</span></div>` : ''}
-        ${u.datum ? `<div class="uk-info-sor">📅 <span>${u.datum}</span></div>` : ''}
-      </div>
-      ${teljes > 0 ? `
-      <div class="uk-penzugyek">
-        <div class="uk-osszeg">
-          <div class="label">Teljes</div>
-          <div class="ertek">${teljes.toLocaleString('hu-HU')} Ft</div>
-        </div>
-        <div class="uk-osszeg">
-          <div class="label">Befizetve</div>
-          <div class="ertek">${befizetve.toLocaleString('hu-HU')} Ft</div>
-        </div>
-        <div class="uk-osszeg">
-          <div class="label">Egyenleg</div>
-          <div class="ertek ${egyenleg > 0 ? 'pozitiv' : 'nulla'}">${egyenleg.toLocaleString('hu-HU')} Ft</div>
-        </div>
-      </div>` : ''}
-      ${u.tennivalo ? `<div class="uk-tennivalo">⚡ ${u.tennivalo}</div>` : ''}
-    </div>`;
-}
-
-function ugyfelBefizetek(u) {
-  return befizetek.filter(b => b.ugyfelId === u.id);
-}
-function ugyfelBefizetve(u) {
-  return ugyfelBefizetek(u).reduce((s, b) => s + b.osszeg, 0);
-}
-function ugyfelTeljes(u) {
-  return u.alapdij + (pluszRendeles[u.email] || 0);
-}
-function ugyfelEgyenleg(u) {
-  return ugyfelTeljes(u) - ugyfelBefizetve(u);
-}
-
-function statisztikakFrissit() {
-  const aktiv = ugyfelek.filter(u => u.statusz && u.statusz !== 'Lezárva').length;
-  const kintlevo = ugyfelek.reduce((s, u) => s + Math.max(0, ugyfelEgyenleg(u)), 0);
-  const befolyt = befizetek.reduce((s, b) => s + b.osszeg, 0);
-
-  document.getElementById('stat-osszes').textContent = ugyfelek.length;
-  document.getElementById('stat-aktiv').textContent = aktiv;
-  document.getElementById('stat-kintlevo').textContent = kintlevo.toLocaleString('hu-HU') + ' Ft';
-  document.getElementById('stat-befolyt').textContent = befolyt.toLocaleString('hu-HU') + ' Ft';
+  return `<div class="ugyfel-kartya ${penzClass}" onclick="ugyfelSzerkeszt('${u.id}')">
+    <div class="uk-header">
+      <div><div class="uk-nev">${u.nev}</div><div class="uk-tipus">${u.tipus||'—'}</div></div>
+      <span class="statusz-badge ${statuszClass(u.statusz)}">${u.statusz||'—'}</span>
+    </div>
+    <div class="uk-info">
+      ${u.email?`<div class="uk-info-sor">✉️ <span>${u.email}</span></div>`:''}
+      ${u.telefon?`<div class="uk-info-sor">📱 <span>${u.telefon}</span></div>`:''}
+      ${u.datum?`<div class="uk-info-sor">📅 <span>${u.datum}</span></div>`:''}
+    </div>
+    ${teljes>0?`<div class="uk-penzugyek">
+      <div class="uk-osszeg"><div class="label">Teljes</div><div class="ertek">${teljes.toLocaleString('hu-HU')} Ft</div></div>
+      <div class="uk-osszeg"><div class="label">Befiz.</div><div class="ertek">${befizetve.toLocaleString('hu-HU')} Ft</div></div>
+      <div class="uk-osszeg"><div class="label">Egyenleg</div><div class="ertek ${egyenleg>0?'pozitiv':'nulla'}">${egyenleg.toLocaleString('hu-HU')} Ft</div></div>
+    </div>`:''}
+    ${u.tennivalo?`<div class="uk-tennivalo">⚡ ${u.tennivalo}</div>`:''}
+    ${hatarido?`<div class="uk-hatarido">🗓 ${hatarido}</div>`:''}
+  </div>`;
 }
 
 // ============================================================
-// MODAL
+// ÜGYFÉL MODAL
 // ============================================================
 function ujUgyfelModal() {
   aktualisUgyfelId = null;
@@ -989,31 +778,23 @@ function ujUgyfelModal() {
   document.getElementById('modal-cim').textContent = 'Új ügyfél';
   document.getElementById('torles-btn').style.display = 'none';
   document.getElementById('penzugyek-szekció').style.display = 'none';
-
-  // Form reset
-  ['f-nev','f-email','f-telefon','f-album','f-tennivalo','f-megjegyzes'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['f-nev','f-email','f-telefon','f-album','f-tennivalo','f-megjegyzes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-alapdij').value = '';
-  document.getElementById('f-datum').value = new Date().toISOString().split('T')[0];
-  document.getElementById('f-statusz').value = beallitasok.statuszok[0] || '';
-  const tSelect = document.getElementById('f-tennivalo-select');
-  if (tSelect) tSelect.value = '';
-
+  document.getElementById('f-datum').value = '';
+  document.getElementById('f-hatarido').value = '';
+  document.getElementById('f-statusz').value = beallitasok.statuszok[0]||'';
+  document.getElementById('f-tennivalo-select').value = '';
   document.getElementById('ugyfel-modal').classList.add('aktiv');
 }
 
 function ugyfelSzerkeszt(id) {
   const u = ugyfelek.find(x => x.id === id);
   if (!u) return;
-
   aktualisUgyfelId = id;
   aktualisBefizetek = [...ugyfelBefizetek(u)];
-
   document.getElementById('modal-cim').textContent = u.nev;
   document.getElementById('torles-btn').style.display = 'block';
   document.getElementById('penzugyek-szekció').style.display = 'block';
-
   document.getElementById('f-nev').value = u.nev;
   document.getElementById('f-email').value = u.email;
   document.getElementById('f-telefon').value = u.telefon;
@@ -1021,128 +802,91 @@ function ugyfelSzerkeszt(id) {
   document.getElementById('f-tipus').value = u.tipus;
   document.getElementById('f-statusz').value = u.statusz;
   document.getElementById('f-album').value = u.albumId;
-  document.getElementById('f-alapdij').value = u.alapdij || '';
+  document.getElementById('f-alapdij').value = u.alapdij||'';
   document.getElementById('f-datum').value = u.datum;
+  document.getElementById('f-hatarido').value = u.hatarido||'';
   document.getElementById('f-tennivalo').value = u.tennivalo;
-  const tSelect = document.getElementById('f-tennivalo-select');
-  if (tSelect) {
-    const opt = [...tSelect.options].find(o => o.value === u.tennivalo);
-    tSelect.value = opt ? u.tennivalo : '';
-  }
   document.getElementById('f-megjegyzes').value = u.megjegyzes;
-
+  const tSel = document.getElementById('f-tennivalo-select');
+  tSel.value = [...tSel.options].find(o => o.value === u.tennivalo) ? u.tennivalo : '';
   befizetesListaFrissit(u);
   document.getElementById('ugyfel-modal').classList.add('aktiv');
 }
 
+function tennivaloValaszt() {
+  const v = document.getElementById('f-tennivalo-select').value;
+  if (v) document.getElementById('f-tennivalo').value = v;
+}
+
 function befizetesListaFrissit(u) {
   const lista = document.getElementById('befizetes-lista');
-  if (aktualisBefizetek.length === 0) {
-    lista.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:0.5rem 0">Még nincs rögzített befizetés.</div>';
-  } else {
-    lista.innerHTML = aktualisBefizetek.map((b, i) => `
+  lista.innerHTML = aktualisBefizetek.length === 0
+    ? '<div style="color:var(--muted);font-size:0.8rem;padding:0.4rem 0">Még nincs befizetés.</div>'
+    : aktualisBefizetek.map((b, i) => `
       <div class="befizetes-sor">
-        <div class="b-bal">
-          <div class="b-datum">${b.datum}</div>
-          <div>${b.megjegyzes || ''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.75rem">
-          <div>
-            <div class="b-osszeg">${b.osszeg.toLocaleString('hu-HU')} Ft</div>
-            <div class="b-mod">${b.mod}</div>
-          </div>
+        <div class="b-bal"><div class="b-datum">${b.datum||'—'}</div><div>${b.megjegyzes||''}</div></div>
+        <div style="display:flex;align-items:center;gap:0.6rem">
+          <div><div class="b-osszeg">${b.osszeg.toLocaleString('hu-HU')} Ft</div><div class="b-mod">${b.mod}</div></div>
           <button class="b-torles" onclick="befizetesTorol(${i})">✕</button>
         </div>
       </div>`).join('');
-  }
 
-  // Összesítő frissítés
   const befizetve = aktualisBefizetek.reduce((s, b) => s + b.osszeg, 0);
-  const alapdij = parseFloat(document.getElementById('f-alapdij').value) || 0;
-  const plusz = u ? (pluszRendeles[u.email] || 0) : 0;
-  const teljes = alapdij + plusz;
+  const alapdij = parseFloat(document.getElementById('f-alapdij').value)||0;
+  const teljes = alapdij;
   const egyenleg = teljes - befizetve;
-
   document.getElementById('po-teljes').textContent = teljes.toLocaleString('hu-HU') + ' Ft';
   document.getElementById('po-befizetve').textContent = befizetve.toLocaleString('hu-HU') + ' Ft';
   document.getElementById('po-egyenleg').textContent = egyenleg.toLocaleString('hu-HU') + ' Ft';
-  document.getElementById('po-egyenleg').style.color = egyenleg > 0 ? 'var(--danger)' : 'var(--accent)';
+  document.getElementById('po-egyenleg').style.color = egyenleg > 0 ? 'var(--danger)' : '#3a6b3a';
 }
 
 function befizetesHozzaad() {
   const datum = document.getElementById('b-datum').value;
-  const osszeg = parseFloat(document.getElementById('b-osszeg').value) || 0;
+  const osszeg = parseFloat(document.getElementById('b-osszeg').value)||0;
   const mod = document.getElementById('b-mod').value;
-
-  if (!datum || osszeg <= 0) {
-    alert('Kérjük add meg a dátumot és az összeget!');
-    return;
-  }
-
-  aktualisBefizetek.push({
-    id: 'b_' + Date.now(),
-    ugyfelId: aktualisUgyfelId || '',
-    datum, osszeg, mod, megjegyzes: ''
-  });
-
+  if (!datum || osszeg <= 0) { alert('Kérjük add meg a dátumot és az összeget!'); return; }
+  aktualisBefizetek.push({ id: 'b_'+Date.now(), ugyfelId: aktualisUgyfelId||'', datum, osszeg, mod, megjegyzes: '' });
   document.getElementById('b-datum').value = '';
   document.getElementById('b-osszeg').value = '';
-
-  const u = ugyfelek.find(x => x.id === aktualisUgyfelId);
-  befizetesListaFrissit(u);
+  befizetesListaFrissit(ugyfelek.find(x => x.id === aktualisUgyfelId));
 }
 
 function befizetesTorol(i) {
   aktualisBefizetek.splice(i, 1);
-  const u = ugyfelek.find(x => x.id === aktualisUgyfelId);
-  befizetesListaFrissit(u);
-}
-
-function modalBezar(id) {
-  document.getElementById(id).classList.remove('aktiv');
-}
-
-// ============================================================
-// MENTÉS (Sheets-be írás webhook-on keresztül)
-// ============================================================
-function tennivaloValaszt() {
-  const select = document.getElementById('f-tennivalo-select');
-  const input = document.getElementById('f-tennivalo');
-  if (select.value) {
-    input.value = select.value;
-  }
+  befizetesListaFrissit(ugyfelek.find(x => x.id === aktualisUgyfelId));
 }
 
 async function ugyfelMent() {
   const nev = document.getElementById('f-nev').value.trim();
   if (!nev) { alert('A név kötelező!'); return; }
-
   const ugyfel = {
-    id: aktualisUgyfelId || ('u_' + Date.now()),
-    nev,
-    email: document.getElementById('f-email').value.trim(),
+    id: aktualisUgyfelId || ('u_'+Date.now()),
+    nev, email: document.getElementById('f-email').value.trim(),
     telefon: document.getElementById('f-telefon').value.trim(),
     csatorna: document.getElementById('f-csatorna').value,
     tipus: document.getElementById('f-tipus').value,
     statusz: document.getElementById('f-statusz').value,
     tennivalo: document.getElementById('f-tennivalo').value.trim(),
     albumId: document.getElementById('f-album').value.trim(),
-    alapdij: parseFloat(document.getElementById('f-alapdij').value) || 0,
+    alapdij: parseFloat(document.getElementById('f-alapdij').value)||0,
     datum: document.getElementById('f-datum').value,
     megjegyzes: document.getElementById('f-megjegyzes').value.trim(),
+    hatarido: document.getElementById('f-hatarido').value,
   };
 
-  if (CONFIG.webhookUrl) {
-    try {
-      const params = new URLSearchParams();
-      params.append('action', aktualisUgyfelId ? 'update' : 'create');
-      params.append('ugyfel', JSON.stringify(ugyfel));
-      params.append('befizetek', JSON.stringify(aktualisBefizetek));
-      fetch(CONFIG.webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-    } catch(e) {}
+  // Ha van tennivaló és határidő → auto tennivaló létrehozás
+  if (ugyfel.tennivalo && ugyfel.hatarido) {
+    const meglevo = tennivalok.find(t => t.ugyfelId === ugyfel.id && !t.kesz);
+    if (!meglevo) {
+      const ujTv = { id: 'tv_'+Date.now(), feladat: ugyfel.tennivalo, hatarido: ugyfel.hatarido, ugyfelId: ugyfel.id, megjegyzes: '', kesz: false };
+      tennivalok.push(ujTv);
+      webhookKuld({ action: 'tennivalo_create', tennivalo: ujTv });
+    }
   }
 
-  // Lokális frissítés
+  webhookKuld({ action: aktualisUgyfelId ? 'update' : 'create', ugyfel, befizetek: aktualisBefizetek });
+
   if (aktualisUgyfelId) {
     const idx = ugyfelek.findIndex(x => x.id === aktualisUgyfelId);
     if (idx >= 0) ugyfelek[idx] = ugyfel;
@@ -1150,57 +894,251 @@ async function ugyfelMent() {
     befizetek.push(...aktualisBefizetek.map(b => ({...b, ugyfelId: ugyfel.id})));
   } else {
     ugyfelek.push(ugyfel);
+    ugyfelek.sort((a,b) => a.nev.localeCompare(b.nev,'hu'));
     befizetek.push(...aktualisBefizetek.map(b => ({...b, ugyfelId: ugyfel.id})));
   }
-
   modalBezar('ugyfel-modal');
-  listaFrissit();
-  statisztikakFrissit();
-  // Sikeres mentés
+  szures();
 }
 
-async function ugyfelTorol() {
-  if (!confirm('Biztosan törlöd ezt az ügyfelet?')) return;
+function ugyfelTorol() {
+  if (!confirm('Biztosan törlöd?')) return;
   ugyfelek = ugyfelek.filter(u => u.id !== aktualisUgyfelId);
   befizetek = befizetek.filter(b => b.ugyfelId !== aktualisUgyfelId);
   modalBezar('ugyfel-modal');
-  listaFrissit();
-  statisztikakFrissit();
+  szures();
 }
 
-// ESC = modal bezár
+// ============================================================
+// NAPTÁR
+// ============================================================
+function naptarHonap(irany) {
+  naptarHonapIdx += irany;
+  if (naptarHonapIdx > 11) { naptarHonapIdx = 0; naptarEv++; }
+  if (naptarHonapIdx < 0) { naptarHonapIdx = 11; naptarEv--; }
+  naptarRajzol();
+}
+
+function naptarRajzol() {
+  const honapNevek = ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'];
+  document.getElementById('naptar-cim').textContent = `${naptarEv} ${honapNevek[naptarHonapIdx]}`;
+
+  const ma = new Date();
+  const elsoNap = new Date(naptarEv, naptarHonapIdx, 1);
+  const utolsoNap = new Date(naptarEv, naptarHonapIdx + 1, 0);
+
+  // Hétfőtől kezdjük (0=H, 6=V)
+  let elsoHet = elsoNap.getDay() - 1;
+  if (elsoHet < 0) elsoHet = 6;
+
+  // Esemény index: datum → [{szoveg, tipus}]
+  const esemenyek = {};
+  const addEsemeny = (datum, szoveg, tipus) => {
+    if (!esemenyek[datum]) esemenyek[datum] = [];
+    esemenyek[datum].push({szoveg, tipus});
+  };
+
+  // Ügyfelek határidői
+  ugyfelek.forEach(u => {
+    if (u.hatarido) addEsemeny(u.hatarido, u.tennivalo || u.nev, 'ugyfel');
+  });
+
+  // Tennivalók
+  tennivalok.filter(t => !t.kesz).forEach(t => {
+    if (t.hatarido) {
+      const u = ugyfelek.find(x => x.id === t.ugyfelId);
+      addEsemeny(t.hatarido, (u ? u.nev + ': ' : '') + t.feladat, 'sajat');
+    }
+  });
+
+  const grid = document.getElementById('naptar-grid');
+  grid.innerHTML = '';
+
+  // Üres napok az elején
+  for (let i = 0; i < elsoHet; i++) {
+    grid.innerHTML += '<div class="naptar-nap ures"></div>';
+  }
+
+  for (let nap = 1; nap <= utolsoNap.getDate(); nap++) {
+    const datum = `${naptarEv}-${String(naptarHonapIdx+1).padStart(2,'0')}-${String(nap).padStart(2,'0')}`;
+    const isMa = naptarEv === ma.getFullYear() && naptarHonapIdx === ma.getMonth() && nap === ma.getDate();
+    const napEsemenyek = esemenyek[datum] || [];
+
+    let html = `<div class="naptar-nap ${isMa?'ma':''}" onclick="naptarNapKattint('${datum}')">`;
+    html += `<div class="nap-szam">${nap}</div>`;
+    napEsemenyek.slice(0, 3).forEach(e => {
+      html += `<div class="nap-esemeny ${e.tipus}">${e.szoveg}</div>`;
+    });
+    if (napEsemenyek.length > 3) html += `<div class="nap-esemeny">+${napEsemenyek.length-3} több</div>`;
+    html += '</div>';
+    grid.innerHTML += html;
+  }
+}
+
+function naptarNapKattint(datum) {
+  document.getElementById('tv-hatarido').value = datum;
+  document.getElementById('tv-feladat').value = '';
+  document.getElementById('tv-ugyfel').value = '';
+  document.getElementById('tv-megjegyzes').value = '';
+  document.getElementById('tv-modal-cim').textContent = 'Új feladat';
+  document.getElementById('tv-torles-btn').style.display = 'none';
+  aktualisTvId = null;
+  document.getElementById('tennivalo-modal').classList.add('aktiv');
+}
+
+// ============================================================
+// TENNIVALÓK
+// ============================================================
+function tennivalokMegjeleint() {
+  const filter = document.getElementById('tv-filter')?.value || 'aktiv';
+  const ma = new Date().toISOString().split('T')[0];
+
+  let szurt = tennivalok.filter(t => {
+    if (filter === 'aktiv') return !t.kesz;
+    if (filter === 'kesedelmes') return !t.kesz && t.hatarido && t.hatarido < ma;
+    if (filter === 'kesz') return t.kesz;
+    return true;
+  });
+
+  szurt.sort((a, b) => (a.hatarido||'9999') < (b.hatarido||'9999') ? -1 : 1);
+
+  const content = document.getElementById('tennivalo-content');
+  if (szurt.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>Nincs tennivaló ebben a kategóriában</p></div>';
+    return;
+  }
+
+  content.innerHTML = szurt.map(t => {
+    const u = ugyfelek.find(x => x.id === t.ugyfelId);
+    const kesedelmes = !t.kesz && t.hatarido && t.hatarido < ma;
+    const mai = !t.kesz && t.hatarido === ma;
+    let sorClass = t.kesz ? 'kesz' : kesedelmes ? 'kesedelmes' : mai ? 'mai' : 'kovetkező';
+    let datumClass = kesedelmes ? 'kesedelmes' : mai ? 'mai' : '';
+
+    return `<div class="tennivalo-sor ${sorClass}" onclick="tennivaloSzerkeszt('${t.id}')">
+      <div class="tv-check ${t.kesz?'kesz':''}" onclick="event.stopPropagation();tennivaloToggle('${t.id}')">${t.kesz?'✓':''}</div>
+      <div class="tv-tartalom">
+        <div class="tv-feladat">${t.feladat}</div>
+        <div class="tv-meta">
+          ${u?`<span class="tv-ugyfel">👤 ${u.nev}</span>`:''}
+          ${t.hatarido?`<span class="tv-datum ${datumClass}">📅 ${t.hatarido}</span>`:''}
+          ${t.megjegyzes?`<span class="tv-ugyfel">${t.megjegyzes}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function ujTennivaloModal() {
+  aktualisTvId = null;
+  document.getElementById('tv-modal-cim').textContent = 'Új feladat';
+  document.getElementById('tv-torles-btn').style.display = 'none';
+  document.getElementById('tv-feladat').value = '';
+  document.getElementById('tv-hatarido').value = '';
+  document.getElementById('tv-ugyfel').value = '';
+  document.getElementById('tv-megjegyzes').value = '';
+  // Frissítjük az ügyfél listát
+  document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
+  document.getElementById('tennivalo-modal').classList.add('aktiv');
+}
+
+function tennivaloSzerkeszt(id) {
+  const t = tennivalok.find(x => x.id === id);
+  if (!t) return;
+  aktualisTvId = id;
+  document.getElementById('tv-modal-cim').textContent = 'Feladat szerkesztése';
+  document.getElementById('tv-torles-btn').style.display = 'block';
+  document.getElementById('tv-feladat').value = t.feladat;
+  document.getElementById('tv-hatarido').value = t.hatarido;
+  document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
+  document.getElementById('tv-ugyfel').value = t.ugyfelId;
+  document.getElementById('tv-megjegyzes').value = t.megjegyzes;
+  document.getElementById('tennivalo-modal').classList.add('aktiv');
+}
+
+async function tennivaloMent() {
+  const feladat = document.getElementById('tv-feladat').value.trim();
+  const hatarido = document.getElementById('tv-hatarido').value;
+  if (!feladat) { alert('A feladat megadása kötelező!'); return; }
+
+  const tv = {
+    id: aktualisTvId || ('tv_'+Date.now()),
+    feladat, hatarido,
+    ugyfelId: document.getElementById('tv-ugyfel').value,
+    megjegyzes: document.getElementById('tv-megjegyzes').value.trim(),
+    kesz: false,
+  };
+
+  // Ha van ügyfél → frissítjük az ügyfélkartonon is
+  if (tv.ugyfelId) {
+    const u = ugyfelek.find(x => x.id === tv.ugyfelId);
+    if (u) {
+      u.tennivalo = feladat;
+      u.hatarido = hatarido;
+      webhookKuld({ action: 'update', ugyfel: u, befizetek: befizetek.filter(b => b.ugyfelId === u.id) });
+    }
+  }
+
+  webhookKuld({ action: aktualisTvId ? 'tennivalo_update' : 'tennivalo_create', tennivalo: tv });
+
+  if (aktualisTvId) {
+    const idx = tennivalok.findIndex(x => x.id === aktualisTvId);
+    if (idx >= 0) tennivalok[idx] = tv;
+  } else {
+    tennivalok.push(tv);
+  }
+
+  modalBezar('tennivalo-modal');
+  tennivalokMegjeleint();
+  if (document.getElementById('app-naptar').classList.contains('aktiv')) naptarRajzol();
+}
+
+function tennivaloToggle(id) {
+  const t = tennivalok.find(x => x.id === id);
+  if (!t) return;
+  t.kesz = !t.kesz;
+  webhookKuld({ action: 'tennivalo_update', tennivalo: t });
+  tennivalokMegjeleint();
+}
+
+function tennivaloTorol() {
+  if (!confirm('Biztosan törlöd?')) return;
+  tennivalok = tennivalok.filter(t => t.id !== aktualisTvId);
+  webhookKuld({ action: 'tennivalo_delete', id: aktualisTvId });
+  modalBezar('tennivalo-modal');
+  tennivalokMegjeleint();
+}
+
+// ============================================================
+// WEBHOOK
+// ============================================================
+function webhookKuld(adat) {
+  if (!CONFIG.webhookUrl) return;
+  try {
+    const params = new URLSearchParams();
+    Object.entries(adat).forEach(([k, v]) => params.append(k, typeof v === 'object' ? JSON.stringify(v) : v));
+    fetch(CONFIG.webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
+}
+
+// ============================================================
+// EMLÉKEZTETŐ
+// ============================================================
+async function emlekeztetoFuttat() {
+  try {
+    const params = new URLSearchParams({ action: 'emlekezteto' });
+    fetch(CONFIG.webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    alert('✅ Emlékeztetők ellenőrizve!');
+  } catch(e) {}
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function modalBezar(id) { document.getElementById(id).classList.remove('aktiv'); }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
 });
-
-// MOBIL NAVIGÁCIÓ
-function mobileNezet(n, btn) {
-  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('aktiv'));
-  if (btn) btn.classList.add('aktiv');
-  if (n === 'sync') {
-    adatokBetolt();
-  } else {
-    listaFrissit();
-  }
-}
-
-// EMLÉKEZTETŐ FUTTATÁS
-async function emlekeztetoFuttat() {
-  const btn = document.querySelector('.nav-item:nth-child(3)');
-  const eredeti = btn.innerHTML;
-  btn.innerHTML = '<span class="icon">⏳</span> Futtatás...';
-  
-  try {
-    const crmWebhook = CONFIG.webhookUrl;
-    const params = new URLSearchParams({ action: 'emlekezteto' });
-    await fetch(crmWebhook + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-    alert('✅ Emlékeztetők ellenőrizve! Ha volt évforduló, email érkezett.');
-  } catch(e) {
-    alert('Hiba történt: ' + e.message);
-  }
-  
-  btn.innerHTML = eredeti;
-}
 </script>
 </body>
 </html>
