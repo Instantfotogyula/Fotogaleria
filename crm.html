@@ -207,6 +207,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 }
 .nap-esemeny.ugyfel { background: rgba(92,61,46,0.12); color: var(--accent); }
 .nap-esemeny.sajat { background: rgba(156,102,68,0.15); color: var(--accent2); }
+.naptar-nap.kivalasztott { border-color: var(--accent2); border-width: 2px; background: rgba(156,102,68,0.08); }
 
 /* ========== TENNIVALÓK ========== */
 .tennivalok-wrap { padding: 1rem; }
@@ -502,7 +503,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <button class="btn btn-primary" onclick="ujTennivaloModal()">+ Feladat</button>
     </div>
   </div>
-  <div class="content">
+  <div class="content" style="overflow-y:auto">
     <div class="naptar-wrap">
       <div class="naptar-nav">
         <button class="naptar-nav-btn" onclick="naptarHonap(-1)">‹</button>
@@ -519,6 +520,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         <div class="naptar-fejlec">V</div>
       </div>
       <div class="naptar-grid" id="naptar-grid"></div>
+    </div>
+
+    <!-- NAP PANEL - kattintás után jelenik meg -->
+    <div id="nap-panel" style="display:none;margin-top:1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+        <h3 id="nap-panel-cim" style="font-family:var(--serif);font-size:1.1rem;font-weight:400"></h3>
+        <button class="btn btn-primary" onclick="ujTennivaloModalDatum()" style="font-size:0.78rem;padding:0.4rem 0.75rem">+ Új feladat</button>
+      </div>
+      <div id="nap-tennivalok"></div>
     </div>
   </div>
 </div>
@@ -637,7 +647,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 const CONFIG = {
   crmSheetsId: '1oiVA94h4g0DiSOgmpaCUkMKRTOWmGkY5eXXGMswGJDU',
   apiKey: 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbzW98f-FcJChD0G-0fC-ointz17P78wn5b5YMCgx0TeyVRTpOtICH-mEQKmLE6_yGGk/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbxXuYwl2CgecfHFCHe9GAs390nmizjiDead0_Qll3HNQfddRjg8Hn-ftMAUdckKg4SV/exec',
 };
 
 // ============================================================
@@ -1066,6 +1076,7 @@ function naptarHonap(irany) {
   naptarHonapIdx += irany;
   if (naptarHonapIdx > 11) { naptarHonapIdx = 0; naptarEv++; }
   if (naptarHonapIdx < 0) { naptarHonapIdx = 11; naptarEv--; }
+  document.getElementById('nap-panel').style.display = 'none';
   naptarRajzol();
 }
 
@@ -1125,14 +1136,63 @@ function naptarRajzol() {
   }
 }
 
+let kivalasztottDatum = null;
+
 function naptarNapKattint(datum) {
-  document.getElementById('tv-hatarido').value = datum;
+  kivalasztottDatum = datum;
+  
+  // Kiemelt nap vizuálisan
+  document.querySelectorAll('.naptar-nap').forEach(n => n.classList.remove('kivalasztott'));
+  event.currentTarget.classList.add('kivalasztott');
+  
+  // Nap panel megjelenítése
+  const panel = document.getElementById('nap-panel');
+  panel.style.display = 'block';
+  
+  // Dátum formázás
+  const d = new Date(datum);
+  const honapNevek = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+  document.getElementById('nap-panel-cim').textContent = 
+    `${d.getFullYear()}. ${honapNevek[d.getMonth()]} ${d.getDate()}.`;
+  
+  // Aznapi tennivalók
+  const napTennivalok = [...tennivalok, ...ugyfelek
+    .filter(u => u.hatarido === datum && u.tennivalo)
+    .map(u => ({ id: 'u_'+u.id, feladat: u.tennivalo, hatarido: u.hatarido, ugyfelId: u.id, kesz: false, _ugyfelNev: u.nev }))
+  ].filter(t => t.hatarido === datum);
+  
+  const napDiv = document.getElementById('nap-tennivalok');
+  
+  if (napTennivalok.length === 0) {
+    napDiv.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:0.5rem 0">Nincs feladat ezen a napon.</div>';
+  } else {
+    const ma = new Date().toISOString().split('T')[0];
+    napDiv.innerHTML = napTennivalok.map(t => {
+      const u = t._ugyfelNev ? {nev: t._ugyfelNev} : ugyfelek.find(x => x.id === t.ugyfelId);
+      const kesedelmes = !t.kesz && t.hatarido < ma;
+      return `<div class="tennivalo-sor ${t.kesz?'kesz':kesedelmes?'kesedelmes':''}" onclick="${t.id.startsWith('u_')?'':"tennivaloSzerkeszt('" + t.id + "')"}">
+        <div class="tv-check ${t.kesz?'kesz':''}" onclick="event.stopPropagation();${t.id.startsWith('u_')?'':"tennivaloToggle('" + t.id + "')"}">${t.kesz?'✓':''}</div>
+        <div class="tv-tartalom">
+          <div class="tv-feladat">${t.feladat}</div>
+          ${u?`<div class="tv-meta"><span class="tv-ugyfel">👤 ${u.nev}</span></div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  
+  // Scroll a panelhez
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+function ujTennivaloModalDatum() {
+  document.getElementById('tv-hatarido').value = kivalasztottDatum || '';
   document.getElementById('tv-feladat').value = '';
   document.getElementById('tv-ugyfel').value = '';
   document.getElementById('tv-megjegyzes').value = '';
   document.getElementById('tv-modal-cim').textContent = 'Új feladat';
   document.getElementById('tv-torles-btn').style.display = 'none';
   aktualisTvId = null;
+  document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
   document.getElementById('tennivalo-modal').classList.add('aktiv');
 }
 
