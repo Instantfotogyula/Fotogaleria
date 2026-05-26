@@ -349,6 +349,51 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .empty-state { text-align: center; padding: 3rem; color: var(--muted); }
 .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 
+/* CHECKBOX TÍPUSOK */
+.tipus-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  user-select: none;
+}
+.tipus-checkbox:hover { border-color: var(--accent2); }
+.tipus-checkbox.aktiv { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.tipus-checkbox input { display: none; }
+
+/* ELŐZMÉNY SZEKCIÓ */
+.elozmenyek-lista { display: flex; flex-direction: column; gap: 0.4rem; }
+.elozmeny-sor {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.elozmeny-bal { display: flex; flex-direction: column; gap: 2px; }
+.elozmeny-datum { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); }
+.elozmeny-tipus { font-weight: 500; }
+.elozmeny-osszeg { font-family: var(--mono); font-weight: 600; color: #3a6b3a; }
+.elozmeny-ossz-box {
+  background: var(--surface2);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
 /* ========== MOBIL ========== */
 @media (max-width: 768px) {
   .fo-gombok { grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
@@ -510,7 +555,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="f-email"></div>
       <div class="form-group"><label class="form-label">Telefon</label><input type="text" class="form-input" id="f-telefon"></div>
       <div class="form-group"><label class="form-label">Csatorna</label><select class="form-select" id="f-csatorna"></select></div>
-      <div class="form-group"><label class="form-label">Fotózás típusa</label><select class="form-select" id="f-tipus"></select></div>
+      <div class="form-group full">
+        <label class="form-label">Fotózás típusa</label>
+        <div id="f-tipus-checkboxok" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.2rem"></div>
+      </div>
       <div class="form-group"><label class="form-label">Státusz</label><select class="form-select" id="f-statusz"></select></div>
       <div class="form-group"><label class="form-label">Album ID</label><input type="text" class="form-input" id="f-album" placeholder="album01"></div>
       <div class="form-group"><label class="form-label">Alapdíj (Ft)</label><input type="number" class="form-input" id="f-alapdij" placeholder="0"></div>
@@ -541,6 +589,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         <div class="form-group"><label class="form-label">Összeg (Ft)</label><input type="number" class="form-input" id="b-osszeg" placeholder="0"></div>
         <div class="form-group"><label class="form-label">Mód</label><select class="form-select" id="b-mod"><option>Utalás</option><option>Készpénz</option><option>Kártya</option></select></div>
         <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-secondary" onclick="befizetesHozzaad()" style="width:100%">+ Hozzáad</button></div>
+      </div>
+    </div>
+
+    <div class="form-section" id="elozmeny-szekció" style="display:none">
+      <div class="form-section-title">📋 Előzmények</div>
+      <div class="elozmenyek-lista" id="elozmenyek-lista"></div>
+      <div class="elozmeny-ossz-box">
+        <span>Összes fotózás: <strong id="elozmeny-db">0</strong> alkalom</span>
+        <span>Összköltés: <strong id="elozmeny-osszeg" style="color:#3a6b3a">0 Ft</strong></span>
       </div>
     </div>
 
@@ -698,8 +755,16 @@ function filterekFeltolt() {
   statSelect.innerHTML = '<option value="">Minden státusz</option>' + beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
   tipusSelect.innerHTML = '<option value="">Minden típus</option>' + beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
   document.getElementById('f-statusz').innerHTML = beallitasok.statuszok.map(s => `<option>${s}</option>`).join('');
-  document.getElementById('f-tipus').innerHTML = beallitasok.tipusok.map(t => `<option>${t}</option>`).join('');
   document.getElementById('f-csatorna').innerHTML = beallitasok.csatornak.map(c => `<option>${c}</option>`).join('');
+  
+  // Checkbox típusok generálása
+  const checkboxDiv = document.getElementById('f-tipus-checkboxok');
+  if (checkboxDiv) {
+    checkboxDiv.innerHTML = beallitasok.tipusok.map(t => `
+      <label class="tipus-checkbox" onclick="tipusCheckboxToggle(this)">
+        <input type="checkbox" value="${t}"> ${t}
+      </label>`).join('');
+  }
   document.getElementById('f-tennivalo-select').innerHTML = '<option value="">— Válassz —</option>' + beallitasok.tennivaloTipusok.map(t => `<option>${t}</option>`).join('');
   // Tennivaló modal ügyfél lista
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
@@ -714,7 +779,7 @@ function szures() {
   let szurt = ugyfelek.filter(u => {
     if (search && !u.nev.toLowerCase().includes(search) && !u.email.toLowerCase().includes(search)) return false;
     if (statusz && u.statusz !== statusz) return false;
-    if (tipus && u.tipus !== tipus) return false;
+    if (tipus && !u.tipus.split(',').map(t => t.trim()).includes(tipus)) return false;
     if (penzugy === 'kintlevo' && ugyfelEgyenleg(u) <= 0) return false;
     if (penzugy === 'fizetve' && ugyfelEgyenleg(u) !== 0) return false;
     return true;
@@ -792,6 +857,7 @@ function ujUgyfelModal() {
   document.getElementById('f-datum').value = '';
   document.getElementById('f-hatarido').value = '';
   document.getElementById('f-statusz').value = beallitasok.statuszok[0]||'';
+  tipusokBeallít('');
   document.getElementById('f-tennivalo-select').value = '';
   document.getElementById('ugyfel-modal').classList.add('aktiv');
 }
@@ -808,7 +874,7 @@ function ugyfelSzerkeszt(id) {
   document.getElementById('f-email').value = u.email;
   document.getElementById('f-telefon').value = u.telefon;
   document.getElementById('f-csatorna').value = u.csatorna;
-  document.getElementById('f-tipus').value = u.tipus;
+  tipusokBeallít(u.tipus);
   document.getElementById('f-statusz').value = u.statusz;
   document.getElementById('f-album').value = u.albumId;
   document.getElementById('f-alapdij').value = u.alapdij||'';
@@ -819,12 +885,63 @@ function ugyfelSzerkeszt(id) {
   const tSel = document.getElementById('f-tennivalo-select');
   tSel.value = [...tSel.options].find(o => o.value === u.tennivalo) ? u.tennivalo : '';
   befizetesListaFrissit(u);
+  elozmenySzekcionFrissit(u);
   document.getElementById('ugyfel-modal').classList.add('aktiv');
+}
+
+function tipusCheckboxToggle(label) {
+  label.classList.toggle('aktiv');
+  const cb = label.querySelector('input');
+  cb.checked = !cb.checked;
+}
+
+function tipusokBeallít(tipusStr) {
+  document.querySelectorAll('#f-tipus-checkboxok .tipus-checkbox').forEach(label => {
+    const val = label.querySelector('input').value;
+    const aktiv = tipusStr && tipusStr.split(',').map(t => t.trim()).includes(val);
+    label.classList.toggle('aktiv', aktiv);
+    label.querySelector('input').checked = aktiv;
+  });
+}
+
+function tipusokOlvas() {
+  return [...document.querySelectorAll('#f-tipus-checkboxok input:checked')]
+    .map(cb => cb.value).join(', ');
 }
 
 function tennivaloValaszt() {
   const v = document.getElementById('f-tennivalo-select').value;
   if (v) document.getElementById('f-tennivalo').value = v;
+}
+
+function elozmenySzekcionFrissit(u) {
+  const szekció = document.getElementById('elozmeny-szekció');
+  const lista = document.getElementById('elozmenyek-lista');
+  if (!szekció || !lista) return;
+
+  // Az ügyfél összes befizetése = előzmény
+  const bef = ugyfelBefizetek(u);
+  
+  if (bef.length === 0) {
+    szekció.style.display = 'none';
+    return;
+  }
+  
+  szekció.style.display = 'block';
+  
+  // Befizetési előzmények megjelenítése
+  lista.innerHTML = bef.map(b => `
+    <div class="elozmeny-sor">
+      <div class="elozmeny-bal">
+        <div class="elozmeny-tipus">${u.tipus || '—'}</div>
+        <div class="elozmeny-datum">${b.datum || 'Ismeretlen dátum'} • ${b.mod || ''}</div>
+      </div>
+      <div class="elozmeny-osszeg">${b.osszeg.toLocaleString('hu-HU')} Ft</div>
+    </div>`).join('');
+  
+  const osszes = bef.reduce((s, b) => s + b.osszeg, 0);
+  document.getElementById('elozmeny-db').textContent = bef.length;
+  document.getElementById('elozmeny-osszeg').textContent = osszes.toLocaleString('hu-HU') + ' Ft';
 }
 
 function befizetesListaFrissit(u) {
@@ -874,7 +991,7 @@ async function ugyfelMent() {
     nev, email: document.getElementById('f-email').value.trim(),
     telefon: document.getElementById('f-telefon').value.trim(),
     csatorna: document.getElementById('f-csatorna').value,
-    tipus: document.getElementById('f-tipus').value,
+    tipus: tipusokOlvas(),
     statusz: document.getElementById('f-statusz').value,
     tennivalo: document.getElementById('f-tennivalo').value.trim(),
     albumId: document.getElementById('f-album').value.trim(),
