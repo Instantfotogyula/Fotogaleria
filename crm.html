@@ -774,17 +774,6 @@ function filterekFeltolt() {
       <label class="tipus-checkbox">
         <input type="checkbox" value="${t}"> ${t}
       </label>`).join('');
-    
-    // Event listener minden checkboxra
-    checkboxDiv.querySelectorAll('.tipus-checkbox').forEach(label => {
-      label.addEventListener('click', function(e) {
-        const cb = this.querySelector('input');
-        if (e.target !== cb) {
-          cb.checked = !cb.checked;
-        }
-        this.classList.toggle('aktiv', cb.checked);
-      });
-    });
   }
   document.getElementById('f-tennivalo-select').innerHTML = '<option value="">— Válassz —</option>' + beallitasok.tennivaloTipusok.map(t => `<option>${t}</option>`).join('');
   // Tennivaló modal ügyfél lista
@@ -1333,6 +1322,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.aktiv').forEach(m => m.classList.remove('aktiv'));
+});
+
+// Event delegation a checkboxokhoz - mindig működik
+document.addEventListener('click', function(e) {
+  const label = e.target.closest('.tipus-checkbox');
+  if (!label) return;
+  e.preventDefault();
+  const cb = label.querySelector('input[type="checkbox"]');
+  if (cb) {
+    cb.checked = !cb.checked;
+    label.classList.toggle('aktiv', cb.checked);
+  }
 });
 </script>
 </body>
