@@ -227,7 +227,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .tennivalo-sor.kesedelmes { border-left: 3px solid var(--danger); }
 .tennivalo-sor.mai { border-left: 3px solid var(--accent2); }
 .tennivalo-sor.kovetkező { border-left: 3px solid #3a6b3a; }
-.tennivalo-sor.kesz { opacity: 0.5; }
+.tennivalo-sor.kesz {
+  opacity: 0.55;
+  background: var(--surface2);
+  border-color: var(--border);
+  border-left: 3px solid var(--border) !important;
+}
+.tennivalo-sor.kesz .tv-feladat {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.tennivalo-sor.kesz .tv-meta {
+  opacity: 0.7;
+}
 .tv-check {
   width: 1.2rem; height: 1.2rem;
   border: 2px solid var(--border);
@@ -240,6 +252,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 }
 .tv-check:hover { border-color: var(--accent); }
 .tv-check.kesz { background: #3a6b3a; border-color: #3a6b3a; color: white; }
+.tv-check.kesz:hover { background: var(--muted); border-color: var(--muted); }
 .tv-tartalom { flex: 1; min-width: 0; }
 .tv-feladat { font-weight: 500; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tv-meta { display: flex; gap: 0.5rem; align-items: center; margin-top: 2px; flex-wrap: wrap; }
@@ -1192,13 +1205,17 @@ function tennivalokMegjeleint() {
   const ma = new Date().toISOString().split('T')[0];
 
   let szurt = tennivalok.filter(t => {
-    if (filter === 'aktiv') return !t.kesz;
+    if (filter === 'aktiv') return true; // aktív nézetben minden látszik
     if (filter === 'kesedelmes') return !t.kesz && t.hatarido && t.hatarido < ma;
     if (filter === 'kesz') return t.kesz;
     return true;
   });
 
-  szurt.sort((a, b) => (a.hatarido||'9999') < (b.hatarido||'9999') ? -1 : 1);
+  // Rendezés: kész feladatok hátulra, azon belül határidő szerint
+  szurt.sort((a, b) => {
+    if (a.kesz !== b.kesz) return a.kesz ? 1 : -1;
+    return (a.hatarido||'9999') < (b.hatarido||'9999') ? -1 : 1;
+  });
 
   const content = document.getElementById('tennivalo-content');
   if (szurt.length === 0) {
