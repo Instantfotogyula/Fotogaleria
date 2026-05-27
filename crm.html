@@ -1218,6 +1218,7 @@ function tennivalokMegjeleint() {
   });
 
   const content = document.getElementById('tennivalo-content');
+  if (!content) return;
   if (szurt.length === 0) {
     content.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>Nincs tennivaló ebben a kategóriában</p></div>';
     return;
@@ -1315,7 +1316,13 @@ function tennivaloToggle(id) {
   if (!t) return;
   t.kesz = !t.kesz;
   webhookKuld({ action: 'tennivalo_update', tennivalo: t });
-  tennivalokMegjeleint();
+  // Ha a nap-panel látható, azt frissítjük, különben a tennivaló listát
+  const panel = document.getElementById('nap-panel');
+  if (panel && panel.style.display !== 'none') {
+    napKattint(kivalasztottDatum);
+  } else {
+    tennivalokMegjeleint();
+  }
 }
 
 function tennivaloTorol() {
