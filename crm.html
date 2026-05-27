@@ -523,6 +523,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         <h3 id="naptar-cim">—</h3>
         <button class="naptar-nav-btn" onclick="naptarHonap(1)">›</button>
       </div>
+      <div id="migracio-figyelmeztet" style="display:none;background:var(--accent2);color:white;padding:0.5rem 1rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.85rem;align-items:center;justify-content:space-between;gap:1rem"><span id="migracio-szoveg"></span><button onclick="ugyfelTennivalokMigral()" style="background:white;color:var(--accent2);border:none;border-radius:4px;padding:0.3rem 0.75rem;cursor:pointer;font-size:0.8rem;white-space:nowrap">Átmigrálás</button></div>
       <div class="naptar-grid" id="naptar-fejlecek">
         <div class="naptar-fejlec">H</div>
         <div class="naptar-fejlec">K</div>
@@ -673,6 +674,7 @@ async function adatokBetolt() {
     await Promise.all([beallitasokBetolt(), ugyfelekBetolt(), befizetesBetolt(), tennivalokBetolt(), elozményekBetolt()]);
     filterekFeltolt();
     foOldalFrissit();
+    migracioEllenorzes();
   } catch(e) {
     console.error('Betöltési hiba:', e);
   }
@@ -754,7 +756,7 @@ function nezetMegnyit(nev) {
   document.querySelectorAll('.app').forEach(a => a.classList.remove('aktiv'));
   document.getElementById('app-' + nev).classList.add('aktiv');
   if (nev === 'ugyfelek') szures();
-  if (nev === 'naptar') naptarRajzol();
+  if (nev === 'naptar') { naptarRajzol(); migracioEllenorzes(); }
 }
 
 function visszaFooldal() {
@@ -1131,6 +1133,47 @@ function naptarRajzol() {
     html += '</div>';
     grid.innerHTML += html;
   }
+}
+
+function migracioEllenorzes() {
+  const migralhatok = ugyfelek.filter(u => u.hatarido && !tennivalok.find(t => t.ugyfelId === u.id));
+  const div = document.getElementById("migracio-figyelmeztet");
+  if (migralhatok.length > 0) {
+    document.getElementById("migracio-szoveg").textContent = migralhatok.length + " ügyfélnél van régi határidős tennivaló ami még nincs átmigrálva.";
+    div.style.display = "flex";
+  } else {
+    div.style.display = "none";
+  }
+}
+
+function ugyfelTennivalokMigral() {
+  const migralhatok = ugyfelek.filter(u => u.hatarido && !tennivalok.find(t => t.ugyfelId === u.id));
+  if (migralhatok.length === 0) return;
+  if (!confirm(migralhatok.length + ' tennivalót átmigrálsz a Tennivalók fülre és törölsz az ügyfélkártyáról. Biztosan?')) return;
+
+  migralhatok.forEach(u => {
+    // Új tennivaló létrehozása
+    const ujTv = {
+      id: 'tv_' + Date.now() + '_' + u.id,
+      feladat: u.tennivalo || ('Tennivaló - ' + u.nev),
+      hatarido: u.hatarido,
+      idopont: '09:00',
+      ugyfelId: u.id,
+      megjegyzes: '',
+      kesz: false,
+    };
+    tennivalok.push(ujTv);
+    webhookKuld({ action: 'tennivalo_create', tennivalo: ujTv });
+
+    // Ügyfélkártya frissítése - tennivalo és hatarido törlése
+    u.tennivalo = '';
+    u.hatarido = '';
+    webhookKuld({ action: 'update', ugyfel: u, befizetek: befizetek.filter(b => b.ugyfelId === u.id) });
+  });
+
+  migracioEllenorzes();
+  naptarRajzol();
+  alert('✅ ' + migralhatok.length + ' tennivaló sikeresen átmigrálva!');
 }
 
 let kivalasztottDatum = null;
