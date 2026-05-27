@@ -1136,7 +1136,7 @@ function naptarRajzol() {
 }
 
 function migracioEllenorzes() {
-  const migralhatok = ugyfelek.filter(u => u.hatarido && !tennivalok.find(t => t.ugyfelId === u.id));
+  const migralhatok = ugyfelek.filter(u => u.hatarido);
   const div = document.getElementById("migracio-figyelmeztet");
   if (migralhatok.length > 0) {
     document.getElementById("migracio-szoveg").textContent = migralhatok.length + " ügyfélnél van régi határidős tennivaló ami még nincs átmigrálva.";
@@ -1147,7 +1147,7 @@ function migracioEllenorzes() {
 }
 
 function ugyfelTennivalokMigral() {
-  const migralhatok = ugyfelek.filter(u => u.hatarido && !tennivalok.find(t => t.ugyfelId === u.id));
+  const migralhatok = ugyfelek.filter(u => u.hatarido);
   if (migralhatok.length === 0) return;
   if (!confirm(migralhatok.length + ' tennivalót átmigrálsz a Tennivalók fülre és törölsz az ügyfélkártyáról. Biztosan?')) return;
 
@@ -1173,6 +1173,7 @@ function ugyfelTennivalokMigral() {
 
   migracioEllenorzes();
   naptarRajzol();
+  if (kivalasztottDatum) { const e = {currentTarget: document.querySelector(".naptar-nap.kivalasztott")}; if(e.currentTarget) naptarNapKattint(kivalasztottDatum); }
   alert('✅ ' + migralhatok.length + ' tennivaló sikeresen átmigrálva!');
 }
 
