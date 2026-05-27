@@ -1230,8 +1230,8 @@ function tennivalokMegjeleint() {
     let sorClass = t.kesz ? 'kesz' : kesedelmes ? 'kesedelmes' : mai ? 'mai' : 'kovetkező';
     let datumClass = kesedelmes ? 'kesedelmes' : mai ? 'mai' : '';
 
-    return `<div class="tennivalo-sor ${sorClass}" onclick="tennivaloSzerkeszt('${t.id}')">
-      <div class="tv-check ${t.kesz?'kesz':''}" onclick="event.stopPropagation();tennivaloToggle('${t.id}')">${t.kesz?'✓':''}</div>
+    return `<div class="tennivalo-sor ${sorClass}" data-id="${t.id}" onclick="tennivaloSzerkeszt(this.dataset.id)">
+      <div class="tv-check ${t.kesz?'kesz':''}" data-id="${t.id}" onclick="event.stopPropagation();tennivaloToggle(this.dataset.id)">${t.kesz?'✓':''}</div>
       <div class="tv-tartalom">
         <div class="tv-feladat">${t.feladat}</div>
         <div class="tv-meta">
