@@ -1154,8 +1154,8 @@ function naptarNapKattint(datum) {
   
   // Aznapi tennivalók
   const napTennivalok = [...tennivalok, ...ugyfelek
-    .filter(u => u.hatarido === datum && u.tennivalo)
-    .map(u => ({ id: 'u_'+u.id, feladat: u.tennivalo, hatarido: u.hatarido, ugyfelId: u.id, kesz: false, _ugyfelNev: u.nev }))
+    .filter(u => u.hatarido === datum)
+    .map(u => ({ id: 'u_'+u.id, feladat: u.tennivalo || u.nev, hatarido: u.hatarido, ugyfelId: u.id, kesz: false, _ugyfelNev: u.nev }))
   ].filter(t => t.hatarido === datum);
   
   const napDiv = document.getElementById('nap-tennivalok');
