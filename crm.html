@@ -1287,16 +1287,6 @@ async function tennivaloMent() {
     kesz: false,
   };
 
-  // Ha van ügyfél → frissítjük az ügyfélkartonon is
-  if (tv.ugyfelId) {
-    const u = ugyfelek.find(x => x.id === tv.ugyfelId);
-    if (u) {
-      u.tennivalo = feladat;
-      u.hatarido = hatarido;
-      webhookKuld({ action: 'update', ugyfel: u, befizetek: befizetek.filter(b => b.ugyfelId === u.id) });
-    }
-  }
-
   webhookKuld({ action: aktualisTvId ? 'tennivalo_update' : 'tennivalo_create', tennivalo: tv });
 
   if (aktualisTvId) {
@@ -1319,7 +1309,7 @@ function tennivaloToggle(id) {
   // Ha a nap-panel látható, azt frissítjük, különben a tennivaló listát
   const panel = document.getElementById('nap-panel');
   if (panel && panel.style.display !== 'none') {
-    napKattint(kivalasztottDatum);
+    naptarNapKattint(kivalasztottDatum);
   } else {
     tennivalokMegjeleint();
   }
