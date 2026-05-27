@@ -1167,8 +1167,8 @@ function naptarNapKattint(datum) {
     napDiv.innerHTML = napTennivalok.map(t => {
       const u = t._ugyfelNev ? {nev: t._ugyfelNev} : ugyfelek.find(x => x.id === t.ugyfelId);
       const kesedelmes = !t.kesz && t.hatarido < ma;
-      return `<div class="tennivalo-sor ${t.kesz?'kesz':kesedelmes?'kesedelmes':''}" onclick="${t.id.startsWith('u_')?'':"tennivaloSzerkeszt('" + t.id + "')"}">
-        <div class="tv-check ${t.kesz?'kesz':''}" onclick="event.stopPropagation();${t.id.startsWith('u_')?'':"tennivaloToggle('" + t.id + "')"}">${t.kesz?'✓':''}</div>
+      return `<div class="tennivalo-sor ${t.kesz?'kesz':kesedelmes?'kesedelmes':''}" data-id="${t.id}" onclick="${t.id.startsWith('u_')?'':'tennivaloSzerkeszt(this.dataset.id)'}">
+        <div class="tv-check ${t.kesz?'kesz':''}" data-id="${t.id}" onclick="event.stopPropagation();${t.id.startsWith('u_')?'':'tennivaloToggle(this.dataset.id)'}">${t.kesz?'✓':''}</div>
         <div class="tv-tartalom">
           <div class="tv-feladat">${t.feladat}</div>
           <div class="tv-meta">
