@@ -523,7 +523,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         <h3 id="naptar-cim">—</h3>
         <button class="naptar-nav-btn" onclick="naptarHonap(1)">›</button>
       </div>
-      <div id="migracio-figyelmeztet" style="display:none;background:var(--accent2);color:white;padding:0.5rem 1rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.85rem;align-items:center;justify-content:space-between;gap:1rem"><span id="migracio-szoveg"></span><button onclick="ugyfelTennivalokMigral()" style="background:white;color:var(--accent2);border:none;border-radius:4px;padding:0.3rem 0.75rem;cursor:pointer;font-size:0.8rem;white-space:nowrap">Átmigrálás</button></div>
+      <!-- migracio-figyelmeztet eltávolítva -->
       <div class="naptar-grid" id="naptar-fejlecek">
         <div class="naptar-fejlec">H</div>
         <div class="naptar-fejlec">K</div>
@@ -579,6 +579,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         </div>
       </div>
       <div class="form-group"><label class="form-label">Határidő</label><input type="date" class="form-input" id="f-hatarido"></div>
+      <div class="form-group full"><label class="form-label">&nbsp;</label><button type="button" class="btn btn-secondary" onclick="ujTennivaloUgyfelbol()" style="width:100%">📅 + Feladat létrehozása a naptárba</button></div>
       <div class="form-group full"><label class="form-label">Megjegyzés</label><textarea class="form-textarea" id="f-megjegyzes"></textarea></div>
     </div>
 
@@ -1034,16 +1035,6 @@ async function ugyfelMent() {
     window.elozmenyek.push(elozmeny);
   }
 
-  // Ha van tennivaló és határidő → auto tennivaló létrehozás
-  if (ugyfel.tennivalo && ugyfel.hatarido) {
-    const meglevo = tennivalok.find(t => t.ugyfelId === ugyfel.id && !t.kesz);
-    if (!meglevo) {
-      const ujTv = { id: 'tv_'+Date.now(), feladat: ugyfel.tennivalo, hatarido: ugyfel.hatarido, ugyfelId: ugyfel.id, megjegyzes: '', kesz: false };
-      tennivalok.push(ujTv);
-      webhookKuld({ action: 'tennivalo_create', tennivalo: ujTv });
-    }
-  }
-
   webhookKuld({ action: aktualisUgyfelId ? 'update' : 'create', ugyfel, befizetek: aktualisBefizetek });
 
   if (aktualisUgyfelId) {
@@ -1196,11 +1187,8 @@ function naptarNapKattint(datum) {
   document.getElementById('nap-panel-cim').textContent = 
     `${d.getFullYear()}. ${honapNevek[d.getMonth()]} ${d.getDate()}.`;
   
-  // Aznapi tennivalók
-  const napTennivalok = [...tennivalok, ...ugyfelek
-    .filter(u => u.hatarido === datum)
-    .map(u => ({ id: 'u_'+u.id, feladat: u.tennivalo || u.nev, hatarido: u.hatarido, ugyfelId: u.id, kesz: false, _ugyfelNev: u.nev }))
-  ].filter(t => t.hatarido === datum);
+  // Aznapi tennivalók (csak valódi Sheets tennivalók)
+  const napTennivalok = tennivalok.filter(t => t.hatarido === datum);
   
   const napDiv = document.getElementById('nap-tennivalok');
   
@@ -1226,6 +1214,22 @@ function naptarNapKattint(datum) {
   
   // Scroll a panelhez
   setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+function ujTennivaloUgyfelbol() {
+  const hatarido = document.getElementById('f-hatarido').value;
+  const tennivalo = document.getElementById('f-tennivalo').value.trim();
+  const ugyfelId = aktualisUgyfelId;
+  aktualisTvId = null;
+  document.getElementById('tv-modal-cim').textContent = 'Új feladat';
+  document.getElementById('tv-torles-btn').style.display = 'none';
+  document.getElementById('tv-feladat').value = tennivalo || '';
+  document.getElementById('tv-hatarido').value = hatarido || '';
+  document.getElementById('tv-idopont').value = '09:00';
+  document.getElementById('tv-megjegyzes').value = '';
+  document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
+  if (ugyfelId) document.getElementById('tv-ugyfel').value = ugyfelId;
+  document.getElementById('tennivalo-modal').classList.add('aktiv');
 }
 
 function ujTennivaloModalDatum() {
