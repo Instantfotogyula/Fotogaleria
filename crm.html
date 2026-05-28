@@ -579,6 +579,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
         </div>
       </div>
       <div class="form-group"><label class="form-label">Határidő</label><input type="date" class="form-input" id="f-hatarido"></div>
+      <div class="form-group"><label class="form-label">Időpont</label><input type="time" class="form-input" id="f-idopont" value="09:00"></div>
       <div class="form-group full"><label class="form-label">&nbsp;</label><button type="button" class="btn btn-secondary" onclick="ujTennivaloUgyfelbol()" style="width:100%">📅 + Feladat létrehozása a naptárba</button></div>
       <div class="form-group full"><label class="form-label">Megjegyzés</label><textarea class="form-textarea" id="f-megjegyzes"></textarea></div>
     </div>
@@ -876,6 +877,7 @@ function ujUgyfelModal() {
   document.getElementById('f-alapdij').value = '';
   document.getElementById('f-datum').value = '';
   document.getElementById('f-hatarido').value = '';
+  document.getElementById('f-idopont').value = '09:00';
   document.getElementById('f-statusz').value = beallitasok.statuszok[0]||'';
   tipusokBeallít('');
   document.getElementById('f-tennivalo-select').value = '';
@@ -900,6 +902,7 @@ function ugyfelSzerkeszt(id) {
   document.getElementById('f-alapdij').value = u.alapdij||'';
   document.getElementById('f-datum').value = u.datum;
   document.getElementById('f-hatarido').value = u.hatarido||'';
+  document.getElementById('f-idopont').value = u.idopont||'09:00';
   document.getElementById('f-tennivalo').value = u.tennivalo;
   document.getElementById('f-megjegyzes').value = u.megjegyzes;
   const tSel = document.getElementById('f-tennivalo-select');
@@ -1218,6 +1221,7 @@ function naptarNapKattint(datum) {
 
 function ujTennivaloUgyfelbol() {
   const hatarido = document.getElementById('f-hatarido').value;
+  const idopont = document.getElementById('f-idopont').value || '09:00';
   const tennivalo = document.getElementById('f-tennivalo').value.trim();
   const ugyfelId = aktualisUgyfelId;
   aktualisTvId = null;
@@ -1225,7 +1229,7 @@ function ujTennivaloUgyfelbol() {
   document.getElementById('tv-torles-btn').style.display = 'none';
   document.getElementById('tv-feladat').value = tennivalo || '';
   document.getElementById('tv-hatarido').value = hatarido || '';
-  document.getElementById('tv-idopont').value = '09:00';
+  document.getElementById('tv-idopont').value = idopont;
   document.getElementById('tv-megjegyzes').value = '';
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
   if (ugyfelId) document.getElementById('tv-ugyfel').value = ugyfelId;
