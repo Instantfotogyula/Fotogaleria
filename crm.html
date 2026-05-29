@@ -880,9 +880,8 @@ function csvExport() {
     const keresztnev = nevReszek.slice(1).join(' ') || '';
     sorok.push([u.email, keresztnev, vezeteknev, u.tipus||'', u.statusz||'', u.datum||'']);
   });
-  const csv = sorok.map(s => s.map(c => '"' + (c||'').replace(/"/g, '""') + '"').join(',')).join('
-');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const csv = sorok.map(s => s.map(c => '"' + (c||'').replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
