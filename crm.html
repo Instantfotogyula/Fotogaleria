@@ -677,6 +677,7 @@ async function adatokBetolt() {
     filterekFeltolt();
     foOldalFrissit();
     migracioEllenorzes();
+    szures();
   } catch(e) {
     console.error('Betöltési hiba:', e);
   }
@@ -1055,11 +1056,12 @@ async function ugyfelMent() {
 }
 
 function ugyfelTorol() {
-  if (!confirm('Biztosan törlöd?')) return;
-  webhookKuld({ action: 'delete', id: aktualisUgyfelId });
+  if (!confirm("Biztosan törlöd?")) return;
+  console.log("TÖRLÉS - ID:", aktualisUgyfelId);
+  webhookKuld({ action: "delete", id: aktualisUgyfelId });
   ugyfelek = ugyfelek.filter(u => u.id !== aktualisUgyfelId);
   befizetek = befizetek.filter(b => b.ugyfelId !== aktualisUgyfelId);
-  modalBezar('ugyfel-modal');
+  modalBezar("ugyfel-modal");
   szures();
 }
 
