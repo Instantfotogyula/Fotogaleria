@@ -118,6 +118,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   .topbar-actions .btn { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
 }
 
+@media (max-width: 480px) {
+  .topbar { padding: 0.5rem 0.75rem; gap: 0.4rem; }
+  .back-btn { font-size: 0.8rem; padding: 0.35rem 0.6rem; }
+  .topbar h2 { font-size: 0.95rem; }
+  .topbar-actions { gap: 0.3rem; }
+  .topbar-actions .btn { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
+}
+
 /* ========== ÜGYFELEK NÉZET ========== */
 .filters {
   padding: 0.5rem 1rem;
@@ -491,7 +499,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <button class="btn btn-primary" onclick="ujUgyfelModal()">+ Új</button>
       <button class="btn btn-secondary" onclick="adatokBetolt()">🔄</button>
       <button class="btn btn-secondary" onclick="emlekeztetoFuttat()">🔔</button>
-      <button class="btn btn-secondary" onclick="csvExport()">📧 Export</button>
+      <button class="btn btn-secondary" onclick="csvExport()">📧</button>
     </div>
   </div>
   <div class="filters">
@@ -530,7 +538,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="topbar-actions">
       <button class="btn btn-secondary" onclick="adatokBetolt()">🔄</button>
       <button class="btn btn-secondary" onclick="emlekeztetoFuttat()">🔔</button>
-      <button class="btn btn-secondary" onclick="csvExport()">📧 Export</button>
     </div>
   </div>
   <div class="content" style="overflow-y:auto">
@@ -808,7 +815,6 @@ function filterekFeltolt() {
   document.getElementById('f-tennivalo-select').innerHTML = '<option value="">— Válassz —</option>' + beallitasok.tennivaloTipusok.map(t => `<option>${t}</option>`).join('');
   // Tennivaló modal ügyfél lista
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
-  // Évek feltöltése
   const evSelect = document.getElementById('filter-datum-ev');
   if (evSelect) {
     const evek = [...new Set(ugyfelek.map(u => u.datum ? u.datum.substring(0,4) : '').filter(Boolean))].sort().reverse();
@@ -823,7 +829,6 @@ function szures() {
   const penzugy = document.getElementById('filter-penzugy')?.value||'';
   const datumEv = document.getElementById('filter-datum-ev')?.value||'';
   const evfordulo = document.getElementById('filter-evfordulo')?.value||'';
-
   const ma = new Date();
 
   let szurt = ugyfelek.filter(u => {
@@ -845,7 +850,6 @@ function szures() {
     }
     return true;
   });
-
   szurtUgyfelek = szurt;
 
   // Stat frissítés
@@ -864,29 +868,30 @@ function szures() {
   content.innerHTML = `<div class="ugyfel-grid">${szurt.map(u => ugyfelKartyaHTML(u)).join('')}</div>`;
 }
 
-
 function csvExport() {
   const lista = szurtUgyfelek.length > 0 ? szurtUgyfelek : ugyfelek;
-  if (lista.length === 0) { alert("Nincs exportálható ügyfél!"); return; }
+  if (lista.length === 0) { alert('Nincs exportálható ügyfél!'); return; }
   const emailesek = lista.filter(u => u.email);
-  if (emailesek.length === 0) { alert("A szűrt listában nincs email cím!"); return; }
-  const sorok = [["Email Address","First Name","Last Name","Fotózás típusa","Státusz","Dátum"]];
+  if (emailesek.length === 0) { alert('A szűrt listában nincs email cím!'); return; }
+  const sorok = [['Email Address','First Name','Last Name','Fotózás típusa','Státusz','Dátum']];
   emailesek.forEach(u => {
-    const nevReszek = u.nev.trim().split(" ");
-    const vezeteknev = nevReszek[0] || "";
-    const keresztnev = nevReszek.slice(1).join(" ") || "";
-    sorok.push([u.email, keresztnev, vezeteknev, u.tipus||"", u.statusz||"", u.datum||""]);
+    const nevReszek = u.nev.trim().split(' ');
+    const vezeteknev = nevReszek[0] || '';
+    const keresztnev = nevReszek.slice(1).join(' ') || '';
+    sorok.push([u.email, keresztnev, vezeteknev, u.tipus||'', u.statusz||'', u.datum||'']);
   });
-  const csv = sorok.map(s => s.map(c => `"${(c||"").replace(/"/g,"""")}`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const csv = sorok.map(s => s.map(c => '"' + (c||'').replace(/"/g, '""') + '"').join(',')).join('
+');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
-  a.download = "mailchimp_export_" + new Date().toISOString().split("T")[0] + ".csv";
+  a.download = 'mailchimp_export_' + new Date().toISOString().split('T')[0] + '.csv';
   a.click();
   URL.revokeObjectURL(url);
-  alert("✅ " + emailesek.length + " cím exportálva!");
+  alert('✅ ' + emailesek.length + ' cím exportálva!');
 }
+
 function ugyfelBefizetek(u) { return befizetek.filter(b => b.ugyfelId === u.id); }
 function ugyfelBefizetve(u) { return ugyfelBefizetek(u).reduce((s, b) => s + b.osszeg, 0); }
 function ugyfelTeljes(u) { return u.alapdij; }
@@ -1296,7 +1301,6 @@ function ujTennivaloUgyfelbol() {
   document.getElementById('tv-idopont').value = idopont;
   document.getElementById('tv-megjegyzes').value = '';
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
-  // Évek feltöltése
   const evSelect = document.getElementById('filter-datum-ev');
   if (evSelect) {
     const evek = [...new Set(ugyfelek.map(u => u.datum ? u.datum.substring(0,4) : '').filter(Boolean))].sort().reverse();
@@ -1316,7 +1320,6 @@ function ujTennivaloModalDatum() {
   document.getElementById('tv-torles-btn').style.display = 'none';
   aktualisTvId = null;
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
-  // Évek feltöltése
   const evSelect = document.getElementById('filter-datum-ev');
   if (evSelect) {
     const evek = [...new Set(ugyfelek.map(u => u.datum ? u.datum.substring(0,4) : '').filter(Boolean))].sort().reverse();
@@ -1383,7 +1386,6 @@ function ujTennivaloModal() {
   document.getElementById('tv-ugyfel').value = '';
   document.getElementById('tv-megjegyzes').value = '';
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
-  // Évek feltöltése
   const evSelect = document.getElementById('filter-datum-ev');
   if (evSelect) {
     const evek = [...new Set(ugyfelek.map(u => u.datum ? u.datum.substring(0,4) : '').filter(Boolean))].sort().reverse();
@@ -1402,7 +1404,6 @@ function tennivaloSzerkeszt(id) {
   document.getElementById('tv-hatarido').value = t.hatarido;
   document.getElementById('tv-idopont').value = t.idopont || '09:00';
   document.getElementById('tv-ugyfel').innerHTML = '<option value="">— Nincs ügyfél —</option>' + ugyfelek.map(u => `<option value="${u.id}">${u.nev}</option>`).join('');
-  // Évek feltöltése
   const evSelect = document.getElementById('filter-datum-ev');
   if (evSelect) {
     const evek = [...new Set(ugyfelek.map(u => u.datum ? u.datum.substring(0,4) : '').filter(Boolean))].sort().reverse();
