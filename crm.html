@@ -1056,6 +1056,7 @@ async function ugyfelMent() {
 
 function ugyfelTorol() {
   if (!confirm('Biztosan törlöd?')) return;
+  webhookKuld({ action: 'delete', id: aktualisUgyfelId });
   ugyfelek = ugyfelek.filter(u => u.id !== aktualisUgyfelId);
   befizetek = befizetek.filter(b => b.ugyfelId !== aktualisUgyfelId);
   modalBezar('ugyfel-modal');
@@ -1125,10 +1126,12 @@ function naptarRajzol() {
 }
 
 function migracioEllenorzes() {
-  const migralhatok = ugyfelek.filter(u => u.hatarido);
   const div = document.getElementById("migracio-figyelmeztet");
+  if (!div) return;
+  const migralhatok = ugyfelek.filter(u => u.hatarido);
   if (migralhatok.length > 0) {
-    document.getElementById("migracio-szoveg").textContent = migralhatok.length + " ügyfélnél van régi határidős tennivaló ami még nincs átmigrálva.";
+    const szoveg = document.getElementById("migracio-szoveg");
+    if (szoveg) szoveg.textContent = migralhatok.length + " ügyfélnél van régi határidős tennivaló ami még nincs átmigrálva.";
     div.style.display = "flex";
   } else {
     div.style.display = "none";
