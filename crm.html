@@ -457,7 +457,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <p>CRM rendszer</p>
   </div>
 
-  <div class="fo-gombok" style="grid-template-columns:1fr 1fr;max-width:400px">
+  <div class="fo-gombok" style="grid-template-columns:1fr 1fr 1fr;max-width:600px">
     <div class="fo-gomb" onclick="nezetMegnyit('ugyfelek')">
       <div class="fo-icon">👥</div>
       <div class="fo-label">Ügyfelek</div>
@@ -467,6 +467,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div class="fo-icon">📅</div>
       <div class="fo-label">Naptár</div>
       <div class="fo-sub" id="fo-tennivalo-szam">— feladat</div>
+    </div>
+    <div class="fo-gomb" onclick="window.open('album_kezelo.html','_blank')">
+      <div class="fo-icon">🗂️</div>
+      <div class="fo-label">Album kezelő</div>
+      <div class="fo-sub">megnyit / zár</div>
     </div>
   </div>
 
