@@ -442,7 +442,7 @@ let albums = [];
 async function loadAlbums() {
   document.getElementById('albums-container').innerHTML = '<div class="loading"><div class="spinner"></div>Adatok betöltése...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Albums?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Album%20kezel%C5%91?key=${API_KEY}`;
     const res = await fetch(url);
     const data = await res.json();
     if (!data.values) { showEmpty(); return; }
