@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InstantFoto — Album Kezelő</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5ede0;
+    --surface: #fdf6ee;
+    --surface2: #eedfd0;
+    --border: #d9c4b0;
+    --accent: #5c3d2e;
+    --accent2: #9c6644;
+    --accent3: #7a4f3a;
+    --danger: #a83232;
+    --text: #2c1a0e;
+    --muted: #8a6f5e;
+    --green: #3a7a4f;
+    --green-bg: #eaf4ee;
+    --red-bg: #faeaea;
+    --font: 'DM Sans', sans-serif;
+    --serif: 'DM Serif Display', serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .logo {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .logo span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 10px;
+  }
+
+  .header-btns { display: flex; gap: 8px; }
+
+  .btn {
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--accent);
+  }
+  .btn-secondary:hover { border-color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fdf6ee;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent3); border-color: var(--accent3); }
+
+  .stats-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    gap: 0;
+  }
+
+  .stat {
+    padding: 14px 28px 14px 0;
+    margin-right: 28px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .main { padding: 28px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .albums-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+
+  .album-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: all 0.2s;
+  }
+
+  .album-card:hover { box-shadow: 0 3px 14px rgba(92,61,46,0.12); transform: translateY(-1px); }
+  .album-card.open { border-color: #a8d4b8; background: #fafdf9; }
+
+  .album-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .album-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.3;
+    max-width: 200px;
+  }
+
+  .album-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .status-pill.nyilvanos {
+    background: var(--green-bg);
+    color: var(--green);
+    border-color: #a8d4b8;
+  }
+
+  .status-pill.zart {
+    background: var(--red-bg);
+    color: var(--danger);
+    border-color: #e8b4b4;
+  }
+
+  .status-pill:hover { opacity: 0.75; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .type-selector {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .type-btn {
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 7px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 11px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .type-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fdf6ee;
+  }
+
+  .type-btn:hover:not(.active) { border-color: var(--accent2); color: var(--accent); }
+
+  .album-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .rendelesek {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .rendelesek strong {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-size: 15px;
+    margin-right: 3px;
+  }
+
+  .footer-btns { display: flex; gap: 6px; }
+
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--accent);
+    font-size: 11px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .link-btn:hover { border-color: var(--accent); background: var(--surface); }
+  .link-btn.copied { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 24px; height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 14px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty { text-align: center; padding: 60px 0; color: var(--muted); }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* Modal */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(44,26,14,0.4);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-bg.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 26px;
+    width: 420px;
+    max-width: 95vw;
+    box-shadow: 0 8px 32px rgba(92,61,46,0.18);
+  }
+
+  .modal h3 {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--accent);
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus, .form-select:focus { border-color: var(--accent2); }
+
+  .modal-btns {
+    display: flex; gap: 8px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: 0 4px 16px rgba(92,61,46,0.12);
+    transform: translateY(60px);
+    opacity: 0;
+    transition: all 0.25s;
+    z-index: 200;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: #a8d4b8; color: var(--green); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span class="logo">InstantFoto <span>// album kezelő</span></span>
+  </div>
+  <div class="header-btns">
+    <button class="btn btn-secondary" onclick="loadAlbums()">↻ Frissítés</button>
+    <button class="btn btn-primary" onclick="openNewModal()">+ Új album</button>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-val" id="stat-total">—</div>
+    <div class="stat-label">Összes album</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" id="stat-open" style="color:var(--green)">—</div>
+    <div class="stat-label">Nyilvános</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" id="stat-orders">—</div>
+    <div class="stat-label">Összes rendelés</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-label">Albumok</div>
+  <div id="albums-container">
+    <div class="loading"><div class="spinner"></div>Adatok betöltése...</div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Új album</h3>
+    <div class="form-group">
+      <label class="form-label">Album azonosító (pl. album01)</label>
+      <input class="form-input" id="f-id" placeholder="album01">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Album neve</label>
+      <input class="form-input" id="f-name" placeholder="pl. Kovács Esküvő 2026">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Típus</label>
+      <select class="form-select" id="f-type">
+        <option value="rendelő">Rendelő</option>
+        <option value="válogató">Válogató</option>
+        <option value="mindkettő">Mindkettő</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Drive mappa URL</label>
+      <input class="form-input" id="f-drive" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal()">Mégse</button>
+      <button class="btn btn-primary" onclick="saveAlbum()">Mentés</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_KEY = 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s';
+const SHEET_ID = '1lmGSh1nwJ1qYYAhG0jIu6zM3jIqoIN1_hKxtex9dSnw';
+const GALERIA_BASE = 'https://instantfotogyula.github.io/Fotogaleria/galeria.html';
+const WEBHOOK = 'https://script.google.com/macros/s/AKfycbw59-67unA6QSL1h4eDyOzGMIvqtkIuY1Z6xNIMnFt0Rc1gcbY5BDsJIc-xsm1VraM/exec';
+
+let albums = [];
+
+async function loadAlbums() {
+  document.getElementById('albums-container').innerHTML = '<div class="loading"><div class="spinner"></div>Adatok betöltése...</div>';
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Albums?key=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.values) { showEmpty(); return; }
+    const rows = data.values.slice(1);
+    albums = rows.map((r, i) => ({
+      row: i + 2,
+      id: r[1] || '',
+      type: r[2] || 'rendelő',
+      status: r[3] || '🔴 zárt',
+      name: r[4] || '',
+      drive: r[5] || '',
+      orders: r[6] || '0'
+    })).filter(a => a.id);
+    renderAlbums();
+    updateStats();
+  } catch (e) {
+    document.getElementById('albums-container').innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div>Nem sikerült betölteni az adatokat.</div>`;
+  }
+}
+
+function renderAlbums() {
+  const c = document.getElementById('albums-container');
+  if (!albums.length) { showEmpty(); return; }
+  c.innerHTML = `<div class="albums-grid">${albums.map(albumCard).join('')}</div>`;
+}
+
+function albumCard(a) {
+  const isOpen = a.status.includes('nyilvános');
+  const link = `${GALERIA_BASE}?album=${a.id}`;
+  return `
+  <div class="album-card ${isOpen ? 'open' : ''}">
+    <div class="album-top">
+      <div>
+        <div class="album-name">${a.name || a.id}</div>
+        <div class="album-id">${a.id}</div>
+      </div>
+      <div class="status-pill ${isOpen ? 'nyilvanos' : 'zart'}" onclick="toggleStatus('${a.id}', ${a.row}, ${isOpen})">
+        <div class="status-dot"></div>
+        ${isOpen ? '🟢 Nyilvános' : '🔴 Zárt'}
+      </div>
+    </div>
+    <div class="type-selector">
+      <button class="type-btn ${a.type==='rendelő'?'active':''}" onclick="setType('${a.id}',${a.row},'rendelő')">Rendelő</button>
+      <button class="type-btn ${a.type==='válogató'?'active':''}" onclick="setType('${a.id}',${a.row},'válogató')">Válogató</button>
+      <button class="type-btn ${a.type==='mindkettő'?'active':''}" onclick="setType('${a.id}',${a.row},'mindkettő')">Mindkettő</button>
+    </div>
+    <div class="album-footer">
+      <div class="rendelesek"><strong>${a.orders}</strong> rendelés</div>
+      <div class="footer-btns">
+        <button class="link-btn" onclick="copyLink('${link}', this)">📋 Link</button>
+        ${a.drive ? `<a class="link-btn" href="${a.drive}" target="_blank">☁️ Drive</a>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleStatus(id, row, isOpen) {
+  const newStatus = isOpen ? '🔴 zárt' : '🟢 nyilvános';
+  await fetch(WEBHOOK, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'updateCell', range: `Albums!D${row}`, value: newStatus }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const a = albums.find(x => x.id === id);
+  if (a) { a.status = newStatus; renderAlbums(); updateStats(); }
+  showToast(isOpen ? 'Album lezárva' : 'Album megnyitva', 'success');
+}
+
+async function setType(id, row, type) {
+  await fetch(WEBHOOK, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'updateCell', range: `Albums!C${row}`, value: type }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const a = albums.find(x => x.id === id);
+  if (a) { a.type = type; renderAlbums(); }
+  showToast(`Típus: ${type}`, 'success');
+}
+
+function copyLink(link, btn) {
+  navigator.clipboard.writeText(link).then(() => {
+    btn.textContent = '✓ Másolva';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = '📋 Link'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function updateStats() {
+  const open = albums.filter(a => a.status.includes('nyilvános')).length;
+  const total = albums.reduce((s, a) => s + parseInt(a.orders || 0), 0);
+  document.getElementById('stat-total').textContent = albums.length;
+  document.getElementById('stat-open').textContent = open;
+  document.getElementById('stat-orders').textContent = total;
+}
+
+function showEmpty() {
+  document.getElementById('albums-container').innerHTML =
+    `<div class="empty"><div class="empty-icon">📂</div>Még nincsenek albumok.</div>`;
+}
+
+function openNewModal() {
+  ['f-id','f-name','f-drive'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-type').value = 'rendelő';
+  document.getElementById('modal-title').textContent = 'Új album';
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+async function saveAlbum() {
+  const id = document.getElementById('f-id').value.trim();
+  const name = document.getElementById('f-name').value.trim();
+  const type = document.getElementById('f-type').value;
+  const drive = document.getElementById('f-drive').value.trim();
+  if (!id || !name) { showToast('Töltsd ki az azonosítót és a nevet!'); return; }
+  await fetch(WEBHOOK, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'newAlbum', albumId: id, name, type, drive }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  closeModal();
+  showToast('Album létrehozva', 'success');
+  setTimeout(loadAlbums, 1200);
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+
+loadAlbums();
+</script>
+</body>
+</html>
