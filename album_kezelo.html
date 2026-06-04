@@ -371,7 +371,6 @@
   </div>
   <div class="header-btns">
     <button class="btn btn-secondary" onclick="loadAlbums()">↻ Frissítés</button>
-    <button class="btn btn-primary" onclick="openNewModal()">+ Új album</button>
   </div>
 </header>
 
@@ -492,7 +491,7 @@ function albumCard(a) {
       <div class="rendelesek"><strong>${a.orders}</strong> rendelés</div>
       <div class="footer-btns">
         <button class="link-btn" onclick="copyLink('${link}', this)">📋 Link</button>
-        ${a.drive ? `<a class="link-btn" href="${a.drive}" target="_blank">☁️ Drive</a>` : ''}
+        ${a.drive ? `<a class="link-btn" href="https://drive.google.com/drive/folders/${a.drive}" target="_blank">☁️ Drive</a>` : ''}
       </div>
     </div>
   </div>`;
