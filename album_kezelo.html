@@ -432,7 +432,7 @@
 const API_KEY = 'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s';
 const SHEET_ID = '1lmGSh1nwJ1qYYAhG0jIu6zM3jIqoIN1_hKxtex9dSnw';
 const GALERIA_BASE = 'https://instantfotogyula.github.io/Fotogaleria/galeria.html';
-const WEBHOOK = 'https://script.google.com/macros/s/AKfycbwc8VtEkyRc_laKHt9C5Owm2Jh0fac8YtuS3T7yJM2jMi0chnUtIA-hci_PjvuK69s/exec';
+const WEBHOOK = 'https://script.google.com/macros/s/AKfycbxOfQNPIlvMDw7MYIXlsIiRdhUjdGQ-RJ31-c0DEpaPQ3OwSjqaJ4dDLD847R15234/exec';
 
 let albums = [];
 
@@ -499,22 +499,16 @@ function albumCard(a) {
 
 async function toggleStatus(id, row, isOpen) {
   const newStatus = isOpen ? '🔴 zárt' : '🟢 nyilvános';
-  await fetch(WEBHOOK, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'updateCell', range: `Album kezelő!D${row}`, value: newStatus }),
-    headers: { 'Content-Type': 'application/json' }
-  });
+  const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!D' + row)}&value=${encodeURIComponent(newStatus)}`;
+  await fetch(url, { method: 'GET', mode: 'no-cors' });
   const a = albums.find(x => x.id === id);
   if (a) { a.status = newStatus; renderAlbums(); updateStats(); }
   showToast(isOpen ? 'Album lezárva' : 'Album megnyitva', 'success');
 }
 
 async function setType(id, row, type) {
-  await fetch(WEBHOOK, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'updateCell', range: `Album kezelő!C${row}`, value: type }),
-    headers: { 'Content-Type': 'application/json' }
-  });
+  const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!C' + row)}&value=${encodeURIComponent(type)}`;
+  await fetch(url, { method: 'GET', mode: 'no-cors' });
   const a = albums.find(x => x.id === id);
   if (a) { a.type = type; renderAlbums(); }
   showToast(`Típus: ${type}`, 'success');
