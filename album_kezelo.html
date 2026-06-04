@@ -447,12 +447,12 @@ async function loadAlbums() {
     const rows = data.values.slice(1);
     albums = rows.map((r, i) => ({
       row: i + 2,
-      id: r[1] || '',
+      id: r[0] || '',
+      name: r[1] || '',
       type: r[2] || 'rendelő',
       status: r[3] || '🔴 zárt',
-      name: r[4] || '',
-      drive: r[5] || '',
-      orders: r[6] || '0'
+      drive: r[4] || '',
+      orders: r[5] || '0'
     })).filter(a => a.id);
     renderAlbums();
     updateStats();
@@ -502,7 +502,7 @@ async function toggleStatus(id, row, isOpen) {
   const newStatus = isOpen ? '🔴 zárt' : '🟢 nyilvános';
   await fetch(WEBHOOK, {
     method: 'POST',
-    body: JSON.stringify({ action: 'updateCell', range: `Albums!D${row}`, value: newStatus }),
+    body: JSON.stringify({ action: 'updateCell', range: `Album kezelő!D${row}`, value: newStatus }),
     headers: { 'Content-Type': 'application/json' }
   });
   const a = albums.find(x => x.id === id);
@@ -513,7 +513,7 @@ async function toggleStatus(id, row, isOpen) {
 async function setType(id, row, type) {
   await fetch(WEBHOOK, {
     method: 'POST',
-    body: JSON.stringify({ action: 'updateCell', range: `Albums!C${row}`, value: type }),
+    body: JSON.stringify({ action: 'updateCell', range: `Album kezelő!C${row}`, value: type }),
     headers: { 'Content-Type': 'application/json' }
   });
   const a = albums.find(x => x.id === id);
