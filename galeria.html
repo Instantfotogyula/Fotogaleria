@@ -519,7 +519,7 @@ async function init() {
 
   try {
     // Sheets beolvasás
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:L100?key=${CONFIG.apiKey}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:K100?key=${CONFIG.apiKey}`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('Sheets API hiba: ' + resp.status);
     const data = await resp.json();
@@ -539,10 +539,9 @@ async function init() {
       tipus:      row[2] || 'rendelő',
       allapot:    row[3] || '🔴 zárt',
       folderId:   row[4] || '',
-      engedélyezettMeretek: (row[5] || '').trim() ? row[5].split(',').map(s => s.trim()).filter(Boolean) : [],
-      csomagDb:   parseInt(row[6]) || 0,
-      egysegAr:   parseInt(row[7]) || 0,
-      webhookUrl: row[11] || '',
+      csomagDb:   parseInt(row[5]) || 0,
+      egysegAr:   parseInt(row[6]) || 0,
+      webhookUrl: row[10] || '',
     };
 
     webhookUrl = albumConfig.webhookUrl;
@@ -637,10 +636,7 @@ function galeriaMegjelenít() {
     }
 
     if (!isValogato) {
-      const aktívMeretek = (albumConfig.engedélyezettMeretek || []).length > 0
-        ? MERETEK.filter(m => albumConfig.engedélyezettMeretek.includes(m.id))
-        : MERETEK;
-      panelHtml += aktívMeretek.map(m => `
+      panelHtml += MERETEK.map(m => `
         <div class="meret-sor">
           <span class="meret-nev">${m.nev}${m.megjegyzes ? '<br><small style="color:#aaa;font-weight:400">'+m.megjegyzes+'</small>' : ''}</span>
           <span class="meret-ar">${m.ar} Ft/${m.egyseg}</span>
@@ -731,13 +727,10 @@ function csomagFrissit() {
   if (!albumConfig.csomagDb) return;
   let osszDb = 0;
   let osszAr = 0;
-  const aktívMeretek = (albumConfig.engedélyezettMeretek || []).length > 0
-    ? MERETEK.filter(m => albumConfig.engedélyezettMeretek.includes(m.id))
-    : MERETEK;
   kepek.forEach(kep => {
     const r = rendeles[kep.id];
     if (!r) return;
-    aktívMeretek.forEach(m => {
+    MERETEK.forEach(m => {
       const db = r[m.id] || 0;
       osszDb += db;
       osszAr += db * m.ar;
