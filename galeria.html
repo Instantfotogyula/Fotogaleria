@@ -539,10 +539,10 @@ async function init() {
       tipus:      row[2] || 'rendelő',
       allapot:    row[3] || '🔴 zárt',
       folderId:   row[4] || '',
-      csomagDb:   parseInt(row[5]) || 0,
-      egysegAr:   parseInt(row[6]) || 0,
-      webhookUrl: row[10] || '',
-      engedélyezettMeretek: row[11] ? row[11].split(',').map(s => s.trim()) : [],
+      engedélyezettMeretek: (row[5] || '').trim() ? row[5].split(',').map(s => s.trim()).filter(Boolean) : [],
+      csomagDb:   parseInt(row[6]) || 0,
+      egysegAr:   parseInt(row[7]) || 0,
+      webhookUrl: row[11] || '',
     };
 
     webhookUrl = albumConfig.webhookUrl;
@@ -637,7 +637,7 @@ function galeriaMegjelenít() {
     }
 
     if (!isValogato) {
-      const aktívMeretek = albumConfig.engedélyezettMeretek.length > 0
+      const aktívMeretek = (albumConfig.engedélyezettMeretek || []).length > 0
         ? MERETEK.filter(m => albumConfig.engedélyezettMeretek.includes(m.id))
         : MERETEK;
       panelHtml += aktívMeretek.map(m => `
@@ -731,7 +731,7 @@ function csomagFrissit() {
   if (!albumConfig.csomagDb) return;
   let osszDb = 0;
   let osszAr = 0;
-  const aktívMeretek = albumConfig.engedélyezettMeretek.length > 0
+  const aktívMeretek = (albumConfig.engedélyezettMeretek || []).length > 0
     ? MERETEK.filter(m => albumConfig.engedélyezettMeretek.includes(m.id))
     : MERETEK;
   kepek.forEach(kep => {
