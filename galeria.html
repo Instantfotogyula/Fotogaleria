@@ -481,16 +481,19 @@
 const CONFIG = {
   sheetsId:   '1lmGSh1nwJ1qYYAhG0jIu6zM3jIqoIN1_hKxtex9dSnw',
   apiKey:     'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
-  arakLap:    'Árlista',   // a Sheet lapjának neve: A oszlop = Méret, B oszlop = Ár (Ft)
+  arakLap:    'Árlista',   // árlap neve a Sheetben. Oszlopok: A Méret | B Ár (Ft) | C Egység (db/adag) | D Megjegyzés | E Alapból látszik (igen/nem)
 };
 
-// Az ÁR a Sheet "Árlista" lapjáról érkezik (arakBetolt). Az itt megadott ár csak TARTALÉK,
-// ha a lap nem olvasható. A listában csak az a méret jelenik meg, amelynek van sora és ára a Sheetben:
-// méretet elrejteni = a sor törlése (vagy az ár kiürítése) az Árlista lapon.
+// Az ÁR a Sheet "Árlista" lapjáról érkezik. Az itt megadott ár csak TARTALÉK, ha a lap nem olvasható.
+// Mely méretek látszanak egy albumnál:
+//  1) ha az Album kezelő lap L oszlopában (Engedélyezett méretek) van felsorolás, pontosan azok (pl. "10x15, 13x18, igazolvány")
+//  2) különben az Árlista E oszlopa dönt (igen/nem); ha az üres, az alapbeállítás (alapLatszik) érvényes
+//  3) olyan méret sosem látszik, aminek nincs sora és ára az Árlistán
 const MERETEK_ALAP = [
-  { id: '10x15', nev: '10×15 cm', ar: 650,  megjegyzes: '', egyseg: 'db', sheetNev: '10x15 cm' },
-  { id: '13x18', nev: '13×18 cm', ar: 850,  megjegyzes: '', egyseg: 'db', sheetNev: '13x18 cm' },
-  { id: '20x30', nev: '20×30 cm', ar: 1150, megjegyzes: '', egyseg: 'db', sheetNev: '20x30 cm' },
+  { id: '10x15',      nev: '10×15 cm', ar: 650,  megjegyzes: '',            egyseg: 'db',   sheetNev: '10x15 cm',     alias: [],                          alapLatszik: true },
+  { id: '13x18',      nev: '13×18 cm', ar: 850,  megjegyzes: '',            egyseg: 'db',   sheetNev: '13x18 cm',     alias: [],                          alapLatszik: true },
+  { id: '20x30',      nev: '20×30 cm', ar: 1150, megjegyzes: '',            egyseg: 'db',   sheetNev: '20x30 cm',     alias: [],                          alapLatszik: true },
+  { id: 'igazolvany', nev: 'Ig.kép',   ar: 600,  megjegyzes: '6 db / adag', egyseg: 'adag', sheetNev: 'Igazolványkép', alias: ['igazolvany', 'igkep'],     alapLatszik: false },
 ];
 let MERETEK = MERETEK_ALAP.map(m => ({ ...m }));
 
@@ -523,7 +526,7 @@ async function init() {
 
   try {
     // Sheets beolvasás
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:K100?key=${CONFIG.apiKey}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:L100?key=${CONFIG.apiKey}`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('Sheets API hiba: ' + resp.status);
     const data = await resp.json();
@@ -546,6 +549,7 @@ async function init() {
       csomagDb:   parseInt(row[5]) || 0,
       egysegAr:   parseInt(row[6]) || 0,
       webhookUrl: row[10] || '',
+      meretek:    row[11] || '',   // L oszlop: engedélyezett méretek (üres = Árlista alapbeállítása)
     };
 
     webhookUrl = albumConfig.webhookUrl;
@@ -590,28 +594,64 @@ async function init() {
 }
 
 function meretNorm(s) {
-  return String(s || '').toLowerCase().replace(/\s|cm/g, '').replace(/[×*]/g, 'x');
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[×*]/g, 'x').replace(/cm|\s|\./g, '');
+}
+
+function alapErtek(v) {
+  const t = String(v == null ? '' : v).trim().toLowerCase();
+  if (!t) return null;                                   // üres = nincs megadva
+  return !['nem', 'no', '0', 'false', 'x'].includes(t);  // minden más = igen
+}
+
+// arTabla: { normált méretnév: { ar, egyseg, megj, alap } } az Árlistáról; null = tartalék (a Sheet nem olvasható)
+function meretekEpit(arTabla) {
+  const tokenek = String((albumConfig && albumConfig.meretek) || '').split(/[,;\n\/]+/).map(meretNorm).filter(Boolean);
+  const kulcsok = m => [meretNorm(m.sheetNev), ...m.alias];
+  const jeloltek = [];
+  MERETEK_ALAP.forEach(m => {
+    let e = null;
+    if (arTabla) {
+      const k = kulcsok(m).find(k => arTabla[k]);
+      if (!k) return;                                    // nincs sora/ára az Árlistán: nem jelenik meg
+      e = arTabla[k];
+    }
+    jeloltek.push({
+      ...m,
+      ar: e ? e.ar : m.ar,
+      egyseg: (e && e.egyseg) || m.egyseg,
+      megjegyzes: (e && e.megj) || m.megjegyzes,
+      _alap: (e && e.alap !== null) ? e.alap : m.alapLatszik,
+    });
+  });
+  let lista = [];
+  if (tokenek.length) {
+    lista = jeloltek.filter(m => kulcsok(m).some(k => tokenek.includes(k)));
+    if (!lista.length) console.warn('Az album "Engedélyezett méretek" mezője nem tartalmaz ismert/árazott méretet, az alapbeállítás érvényes:', albumConfig.meretek);
+  }
+  if (!lista.length) lista = jeloltek.filter(m => m._alap);
+  return lista;
 }
 
 async function arakBetolt() {
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/${encodeURIComponent(CONFIG.arakLap)}!A2:B50?valueRenderOption=UNFORMATTED_VALUE&key=${CONFIG.apiKey}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/${encodeURIComponent(CONFIG.arakLap)}!A2:E50?valueRenderOption=UNFORMATTED_VALUE&key=${CONFIG.apiKey}`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('Sheets API hiba: ' + resp.status);
     const rows = (await resp.json()).values || [];
-    const arak = {};
+    const tabla = {};
     rows.forEach(r => {
       const ar = parseInt(String(r[1]).replace(/[^\d]/g, ''));
-      if (r[0] && ar > 0) arak[meretNorm(r[0])] = ar;
+      if (r[0] && ar > 0) {
+        tabla[meretNorm(r[0])] = { ar, egyseg: String(r[2] || '').trim(), megj: String(r[3] || '').trim(), alap: alapErtek(r[4]) };
+      }
     });
-    const lista = MERETEK_ALAP
-      .filter(m => arak[meretNorm(m.sheetNev)])
-      .map(m => ({ ...m, ar: arak[meretNorm(m.sheetNev)] }));
+    const lista = meretekEpit(tabla);
     if (!lista.length) throw new Error('Az "' + CONFIG.arakLap + '" lapon nincs használható sor');
     MERETEK = lista;
   } catch (e) {
     console.warn('Árlista betöltése sikertelen, tartalék árak használata:', e.message);
-    MERETEK = MERETEK_ALAP.map(m => ({ ...m }));
+    MERETEK = meretekEpit(null);
   }
 }
 
@@ -879,7 +919,7 @@ async function rendeleKuld() {
         '10*15 cm': r['10x15'] || 0,
         '13*18 cm': r['13x18'] || 0,
         '20*30 cm': r['20x30'] || 0,
-        'igazolványkép': 0,             // már nem rendelhető, az oszlop a fogadó oldal miatt marad
+        'igazolványkép': r['igazolvany'] || 0,
       });
     });
   }
