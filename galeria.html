@@ -481,15 +481,18 @@
 const CONFIG = {
   sheetsId:   '1lmGSh1nwJ1qYYAhG0jIu6zM3jIqoIN1_hKxtex9dSnw',
   apiKey:     'AIzaSyDo6db2TBZeQAVdWJ5GDQ1tAjbxUahuH6s',
+  arakLap:    'Árlista',   // a Sheet lapjának neve: A oszlop = Méret, B oszlop = Ár (Ft)
 };
 
-const MERETEK = [
-  { id: '7x9',        nev: '7×9 cm',    ar: 800,  megjegyzes: '2 db / adag', egyseg: 'adag' },
-  { id: '10x15',      nev: '10×15 cm',  ar: 600,  megjegyzes: '',            egyseg: 'db' },
-  { id: '13x18',      nev: '13×18 cm',  ar: 750,  megjegyzes: '',            egyseg: 'db' },
-  { id: '20x30',      nev: '20×30 cm',  ar: 950,  megjegyzes: '',            egyseg: 'db' },
-  { id: 'igazolvany', nev: 'Ig.kép',    ar: 600,  megjegyzes: '6 db / adag', egyseg: 'adag' },
+// Az ÁR a Sheet "Árlista" lapjáról érkezik (arakBetolt). Az itt megadott ár csak TARTALÉK,
+// ha a lap nem olvasható. A listában csak az a méret jelenik meg, amelynek van sora és ára a Sheetben:
+// méretet elrejteni = a sor törlése (vagy az ár kiürítése) az Árlista lapon.
+const MERETEK_ALAP = [
+  { id: '10x15', nev: '10×15 cm', ar: 650,  megjegyzes: '', egyseg: 'db', sheetNev: '10x15 cm' },
+  { id: '13x18', nev: '13×18 cm', ar: 850,  megjegyzes: '', egyseg: 'db', sheetNev: '13x18 cm' },
+  { id: '20x30', nev: '20×30 cm', ar: 1150, megjegyzes: '', egyseg: 'db', sheetNev: '20x30 cm' },
 ];
+let MERETEK = MERETEK_ALAP.map(m => ({ ...m }));
 
 // ============================================================
 // ÁLLAPOT
@@ -500,6 +503,7 @@ let kivalasztott = {}; // { fileId: true } - válogató módban
 let rendeles = {};     // { fileId: { '10x15': 2, ... } } - rendelős módban
 let apiKey = CONFIG.apiKey;
 let webhookUrl = '';
+let elkuldve = false;  // dupla elküldés elleni védelem
 
 // ============================================================
 // INDULÁS
@@ -575,12 +579,39 @@ async function init() {
       }
     }
 
-    // Képek betöltése
+    // Árlista betöltése a Sheetből, majd képek betöltése
+    await arakBetolt();
     await kepekBetolt();
 
   } catch(e) {
     mutat('hiba');
     document.getElementById('hiba-szoveg').textContent = 'Hiba: ' + e.message;
+  }
+}
+
+function meretNorm(s) {
+  return String(s || '').toLowerCase().replace(/\s|cm/g, '').replace(/[×*]/g, 'x');
+}
+
+async function arakBetolt() {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/${encodeURIComponent(CONFIG.arakLap)}!A2:B50?valueRenderOption=UNFORMATTED_VALUE&key=${CONFIG.apiKey}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Sheets API hiba: ' + resp.status);
+    const rows = (await resp.json()).values || [];
+    const arak = {};
+    rows.forEach(r => {
+      const ar = parseInt(String(r[1]).replace(/[^\d]/g, ''));
+      if (r[0] && ar > 0) arak[meretNorm(r[0])] = ar;
+    });
+    const lista = MERETEK_ALAP
+      .filter(m => arak[meretNorm(m.sheetNev)])
+      .map(m => ({ ...m, ar: arak[meretNorm(m.sheetNev)] }));
+    if (!lista.length) throw new Error('Az "' + CONFIG.arakLap + '" lapon nincs használható sor');
+    MERETEK = lista;
+  } catch (e) {
+    console.warn('Árlista betöltése sikertelen, tartalék árak használata:', e.message);
+    MERETEK = MERETEK_ALAP.map(m => ({ ...m }));
   }
 }
 
@@ -674,7 +705,11 @@ function galeriaMegjelenít() {
 // ============================================================
 function kepKattint(id) {
   const kartya = document.getElementById('kep-' + id);
-  kartya.classList.toggle('aktiv');
+  // Ha már van darabszám, a kártya nyitva marad (különben láthatatlan tétel maradna a rendelésben)
+  const r = rendeles[id];
+  const vanDb = r && Object.values(r).some(v => v > 0);
+  if (vanDb) { kartya.classList.add('aktiv'); }
+  else { kartya.classList.toggle('aktiv'); }
   kosarFrissit();
 }
 
@@ -810,6 +845,7 @@ function kosarBezar() {
 }
 
 async function rendeleKuld() {
+  if (elkuldve) return;
   const nev = document.getElementById('rendelo-nev').value.trim();
   const email = document.getElementById('rendelo-email').value.trim();
   if (!nev) {
@@ -839,11 +875,11 @@ async function rendeleKuld() {
       if (!vanAdat) return;
       adatok.push({
         'Kép sorszáma': sorszam,
-        '7*9 cm': r['7x9'] || 0,
+        '7*9 cm': 0,                    // már nem rendelhető, az oszlop a fogadó oldal miatt marad
         '10*15 cm': r['10x15'] || 0,
         '13*18 cm': r['13x18'] || 0,
         '20*30 cm': r['20x30'] || 0,
-        'igazolványkép': r['igazolvany'] || 0,
+        'igazolványkép': 0,             // már nem rendelhető, az oszlop a fogadó oldal miatt marad
       });
     });
   }
@@ -852,20 +888,33 @@ async function rendeleKuld() {
   btn.disabled = true;
   btn.textContent = 'Küldés...';
 
-  try {
-    if (webhookUrl) {
-      const params = new URLSearchParams({
-        nev, email, album: albumConfig.id,
-        adatok: JSON.stringify(adatok),
-        idopont: new Date().toISOString()
-      });
-      fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-      // no-cors nem ad vissza választ, ezért nem várunk rá
-    }
-  } catch(e) {
-    // csendben kezeljük
+  if (!webhookUrl) {
+    alert('Technikai hiba: a rendelés most nem küldhető el. Kérjük jelezd nekünk!');
+    btn.disabled = false;
+    btn.textContent = 'Elküldés';
+    return;
   }
-  // Mindig megjelenítjük a siker képernyőt
+
+  try {
+    const params = new URLSearchParams({
+      nev, email, album: albumConfig.id,
+      adatok: JSON.stringify(adatok),
+      idopont: new Date().toISOString()
+    });
+    // no-cors: a válasz tartalmát nem látjuk, de a hálózati hibát igen
+    await fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {
+    alert('A rendelést nem sikerült elküldeni. Kérjük ellenőrizd az internetkapcsolatot, és próbáld újra!');
+    btn.disabled = false;
+    btn.textContent = 'Elküldés';
+    return;
+  }
+
+  // Siker: a rendelés törlése, a kosár elrejtése, hogy ne lehessen újra elküldeni
+  elkuldve = true;
+  rendeles = {};
+  kivalasztott = {};
+  document.getElementById('kosar-gomb').style.display = 'none';
   document.getElementById('modal-bg').classList.remove('aktiv');
   document.getElementById('csomag-sav').classList.remove('aktiv');
   mutat('siker');
