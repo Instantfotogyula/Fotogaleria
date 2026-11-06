@@ -490,6 +490,7 @@ const CONFIG = {
 //  2) különben az Árlista E oszlopa dönt (igen/nem); ha az üres, az alapbeállítás (alapLatszik) érvényes
 //  3) olyan méret sosem látszik, aminek nincs sora és ára az Árlistán
 const MERETEK_ALAP = [
+  { id: '7x9',        nev: '7×9 cm',   ar: 800,  megjegyzes: '2 db / adag', egyseg: 'adag', sheetNev: '7x9 cm',       alias: [],                          alapLatszik: false },
   { id: '10x15',      nev: '10×15 cm', ar: 650,  megjegyzes: '',            egyseg: 'db',   sheetNev: '10x15 cm',     alias: [],                          alapLatszik: true },
   { id: '13x18',      nev: '13×18 cm', ar: 850,  megjegyzes: '',            egyseg: 'db',   sheetNev: '13x18 cm',     alias: [],                          alapLatszik: true },
   { id: '20x30',      nev: '20×30 cm', ar: 1150, megjegyzes: '',            egyseg: 'db',   sheetNev: '20x30 cm',     alias: [],                          alapLatszik: true },
@@ -915,7 +916,7 @@ async function rendeleKuld() {
       if (!vanAdat) return;
       adatok.push({
         'Kép sorszáma': sorszam,
-        '7*9 cm': 0,                    // már nem rendelhető, az oszlop a fogadó oldal miatt marad
+        '7*9 cm': r['7x9'] || 0,
         '10*15 cm': r['10x15'] || 0,
         '13*18 cm': r['13x18'] || 0,
         '20*30 cm': r['20x30'] || 0,
