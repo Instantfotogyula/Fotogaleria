@@ -396,36 +396,6 @@
   </div>
 </div>
 
-<div class="modal-bg" id="modal">
-  <div class="modal">
-    <h3 id="modal-title">Új album</h3>
-    <div class="form-group">
-      <label class="form-label">Album azonosító (pl. album01)</label>
-      <input class="form-input" id="f-id" placeholder="album01">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Album neve</label>
-      <input class="form-input" id="f-name" placeholder="pl. Kovács Esküvő 2026">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Típus</label>
-      <select class="form-select" id="f-type">
-        <option value="rendelő">Rendelő</option>
-        <option value="válogató">Válogató</option>
-        <option value="mindkettő">Mindkettő</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Drive mappa URL</label>
-      <input class="form-input" id="f-drive" placeholder="https://drive.google.com/...">
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-secondary" onclick="closeModal()">Mégse</button>
-      <button class="btn btn-primary" onclick="saveAlbum()">Mentés</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -436,23 +406,27 @@ const WEBHOOK = 'https://script.google.com/macros/s/AKfycbxOfQNPIlvMDw7MYIXlsIiR
 
 let albums = [];
 
+async function fetchAlbums() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Album%20kezel%C5%91?key=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data.values) return [];
+  return data.values.slice(1).map((r, i) => ({
+    row: i + 2,
+    id: r[0] || '',
+    name: r[1] || '',
+    type: r[2] || 'rendelő',
+    status: r[3] || '🔴 zárt',
+    drive: r[4] || '',
+    orders: r[5] || '0'
+  })).filter(a => a.id);
+}
+
 async function loadAlbums() {
   document.getElementById('albums-container').innerHTML = '<div class="loading"><div class="spinner"></div>Adatok betöltése...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Album%20kezel%C5%91?key=${API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!data.values) { showEmpty(); return; }
-    const rows = data.values.slice(1);
-    albums = rows.map((r, i) => ({
-      row: i + 2,
-      id: r[0] || '',
-      name: r[1] || '',
-      type: r[2] || 'rendelő',
-      status: r[3] || '🔴 zárt',
-      drive: r[4] || '',
-      orders: r[5] || '0'
-    })).filter(a => a.id);
+    albums = await fetchAlbums();
+    if (!albums.length) { showEmpty(); return; }
     renderAlbums();
     updateStats();
   } catch (e) {
@@ -497,21 +471,56 @@ function albumCard(a) {
   </div>`;
 }
 
-async function toggleStatus(id, row, isOpen) {
-  const newStatus = isOpen ? '🔴 zárt' : '🟢 nyilvános';
-  const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!D' + row)}&value=${encodeURIComponent(newStatus)}`;
+// A jelszó nem az oldalban van: egyszer megkérdezi, és csak ebben a böngészőben jegyzi meg.
+function adminPin() {
+  let pin = '';
+  try { pin = localStorage.getItem('adminPin') || ''; } catch (e) {}
+  if (!pin) {
+    pin = (prompt('Admin jelszó:') || '').trim();
+    if (pin) { try { localStorage.setItem('adminPin', pin); } catch (e) {} }
+  }
+  return pin;
+}
+
+function pinTorol() { try { localStorage.removeItem('adminPin'); } catch (e) {} }
+
+// A szerver válasza no-cors miatt nem olvasható, ezért a módosítás után a Sheetből ellenőrizzük, hogy tényleg átment-e.
+async function cellaModosit(a, oszlop, mezo, ertek) {
+  const pin = adminPin();
+  if (!pin) { showToast('Jelszó nélkül nem módosítható'); return false; }
+  const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!' + oszlop + a.row)}&value=${encodeURIComponent(ertek)}&pin=${encodeURIComponent(pin)}`;
   await fetch(url, { method: 'GET', mode: 'no-cors' });
+  for (const varakozas of [2500, 3000]) {
+    await new Promise(r => setTimeout(r, varakozas));
+    try {
+      const friss = (await fetchAlbums()).find(x => x.id === a.id);
+      if (friss && friss[mezo] === ertek) return true;
+    } catch (e) {}
+  }
+  pinTorol();
+  showToast('Nem sikerült a módosítás – hibás jelszó? Próbáld újra.');
+  return false;
+}
+
+async function toggleStatus(id, row, isOpen) {
   const a = albums.find(x => x.id === id);
-  if (a) { a.status = newStatus; renderAlbums(); updateStats(); }
-  showToast(isOpen ? 'Album lezárva' : 'Album megnyitva', 'success');
+  if (!a) return;
+  const newStatus = isOpen ? '🔴 zárt' : '🟢 nyilvános';
+  showToast('Mentés...');
+  if (await cellaModosit(a, 'D', 'status', newStatus)) {
+    a.status = newStatus; renderAlbums(); updateStats();
+    showToast(isOpen ? 'Album lezárva' : 'Album megnyitva', 'success');
+  }
 }
 
 async function setType(id, row, type) {
-  const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!C' + row)}&value=${encodeURIComponent(type)}`;
-  await fetch(url, { method: 'GET', mode: 'no-cors' });
   const a = albums.find(x => x.id === id);
-  if (a) { a.type = type; renderAlbums(); }
-  showToast(`Típus: ${type}`, 'success');
+  if (!a) return;
+  showToast('Mentés...');
+  if (await cellaModosit(a, 'C', 'type', type)) {
+    a.type = type; renderAlbums();
+    showToast(`Típus: ${type}`, 'success');
+  }
 }
 
 function copyLink(link, btn) {
@@ -535,31 +544,6 @@ function showEmpty() {
     `<div class="empty"><div class="empty-icon">📂</div>Még nincsenek albumok.</div>`;
 }
 
-function openNewModal() {
-  ['f-id','f-name','f-drive'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-type').value = 'rendelő';
-  document.getElementById('modal-title').textContent = 'Új album';
-  document.getElementById('modal').classList.add('show');
-}
-
-function closeModal() { document.getElementById('modal').classList.remove('show'); }
-
-async function saveAlbum() {
-  const id = document.getElementById('f-id').value.trim();
-  const name = document.getElementById('f-name').value.trim();
-  const type = document.getElementById('f-type').value;
-  const drive = document.getElementById('f-drive').value.trim();
-  if (!id || !name) { showToast('Töltsd ki az azonosítót és a nevet!'); return; }
-  await fetch(WEBHOOK, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'newAlbum', albumId: id, name, type, drive }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-  closeModal();
-  showToast('Album létrehozva', 'success');
-  setTimeout(loadAlbums, 1200);
-}
-
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -567,7 +551,6 @@ function showToast(msg, type = '') {
   setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
-document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
 loadAlbums();
 </script>
