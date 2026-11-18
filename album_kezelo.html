@@ -363,9 +363,6 @@
   .toast.success { border-color: #a8d4b8; color: var(--green); }
 
   /* ---- Ügyfélkör kapcsoló ---- */
-  .kor-row { display: flex; align-items: center; gap: 8px; margin: -6px 0 14px; flex-wrap: wrap; }
-  .kor-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); flex: 0 0 auto; }
-  .kor-row .type-selector { margin: 0; flex: 1 1 200px; min-width: 0; }
 
   /* ---- Elrendezés: nem lóghat ki semmi (S20 FE: 412 CSS px, de 360 px-ig is jó) ---- */
   .album-top > div:first-child { flex: 1 1 auto; min-width: 0; }
@@ -436,14 +433,6 @@ const WEBHOOK = 'https://script.google.com/macros/s/AKfycbxOfQNPIlvMDw7MYIXlsIiR
 
 let albums = [];
 
-// Az M oszlop szövege bármilyen írásmódban lehet (pl. „Iskola/óvoda”); az iskola/óvoda szó alapján értelmezzük
-function korNorm(v) {
-  v = String(v || '').trim();
-  if (!v) return '';
-  const t = v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return /iskola|ovoda/.test(t) ? 'iskola-óvoda' : 'család';
-}
-
 async function fetchAlbums() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Album%20kezel%C5%91?key=${API_KEY}`;
   const res = await fetch(url);
@@ -456,9 +445,7 @@ async function fetchAlbums() {
     type: r[2] || 'rendelő',
     status: r[3] || '🔴 zárt',
     drive: r[4] || '',
-    orders: r[5] || '0',
-    ugyfelkor: korNorm(r[12]),
-    ugyfelkorRaw: r[12] || ''
+    orders: r[5] || '0'
   })).filter(a => a.id);
 }
 
@@ -501,13 +488,6 @@ function albumCard(a) {
       <button class="type-btn ${a.type==='válogató'?'active':''}" onclick="setType('${a.id}',${a.row},'válogató')">Válogató</button>
       <button class="type-btn ${a.type==='mindkettő'?'active':''}" onclick="setType('${a.id}',${a.row},'mindkettő')">Mindkettő</button>
     </div>
-    <div class="kor-row">
-      <span class="kor-label">Ügyfélkör</span>
-      <div class="type-selector">
-        <button class="type-btn ${(a.ugyfelkor||'család')==='család'?'active':''}" onclick="setKor('${a.id}','család')">Család</button>
-        <button class="type-btn ${a.ugyfelkor==='iskola-óvoda'?'active':''}" onclick="setKor('${a.id}','iskola-óvoda')">Iskola-óvoda</button>
-      </div>
-    </div>
     <div class="album-footer">
       <div class="rendelesek"><strong>${a.orders}</strong> rendelés</div>
       <div class="footer-btns">
@@ -548,7 +528,7 @@ async function cellaModosit(a, oszlop, mezo, ertek) {
     await new Promise(r => setTimeout(r, varakozas));
     try {
       const friss = (await fetchAlbums()).find(x => x.id === a.id);
-      if (friss && friss[mezo] === ertek && (mezo !== 'ugyfelkor' || friss.ugyfelkorRaw !== '')) return true;
+      if (friss && friss[mezo] === ertek) return true;
     } catch (e) {}
   }
   pinTorol();
@@ -574,16 +554,6 @@ async function setType(id, row, type) {
   if (await cellaModosit(a, 'C', 'type', type)) {
     a.type = type; renderAlbums();
     showToast(`Típus: ${type}`, 'success');
-  }
-}
-
-async function setKor(id, ertek) {
-  const a = albums.find(x => x.id === id);
-  if (!a) return;
-  showToast('Mentés...');
-  if (await cellaModosit(a, 'M', 'ugyfelkor', ertek)) {
-    a.ugyfelkor = ertek; renderAlbums();
-    showToast('Ügyfélkör: ' + ertek, 'success');
   }
 }
 
