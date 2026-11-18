@@ -449,7 +449,7 @@ async function fetchAlbums() {
     status: r[3] || '🔴 zárt',
     drive: r[4] || '',
     orders: r[5] || '0',
-    ugyfelkor: r[12] || 'család'
+    ugyfelkor: r[12] || ''
   })).filter(a => a.id);
 }
 
@@ -495,7 +495,7 @@ function albumCard(a) {
     <div class="kor-row">
       <span class="kor-label">Ügyfélkör</span>
       <div class="type-selector">
-        <button class="type-btn ${a.ugyfelkor==='család'?'active':''}" onclick="setKor('${a.id}','család')">Család</button>
+        <button class="type-btn ${(a.ugyfelkor||'család')==='család'?'active':''}" onclick="setKor('${a.id}','család')">Család</button>
         <button class="type-btn ${a.ugyfelkor==='iskola-óvoda'?'active':''}" onclick="setKor('${a.id}','iskola-óvoda')">Iskola-óvoda</button>
       </div>
     </div>
