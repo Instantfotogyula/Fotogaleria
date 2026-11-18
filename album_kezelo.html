@@ -361,6 +361,36 @@
 
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.success { border-color: #a8d4b8; color: var(--green); }
+
+  /* ---- Ügyfélkör kapcsoló ---- */
+  .kor-row { display: flex; align-items: center; gap: 8px; margin: -6px 0 14px; flex-wrap: wrap; }
+  .kor-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); flex: 0 0 auto; }
+  .kor-row .type-selector { margin: 0; flex: 1 1 200px; min-width: 0; }
+
+  /* ---- Elrendezés: nem lóghat ki semmi (S20 FE: 412 CSS px, de 360 px-ig is jó) ---- */
+  .album-top > div:first-child { flex: 1 1 auto; min-width: 0; }
+  .album-name { max-width: none; overflow-wrap: anywhere; }
+  .status-pill { flex: 0 0 auto; margin-left: 10px; }
+  .album-footer { flex-wrap: wrap; gap: 10px; }
+  .footer-btns { flex-wrap: wrap; }
+
+  @media (max-width: 600px) {
+    header { padding: 10px 14px; }
+    .logo { font-size: 17px; }
+    .logo span { display: block; margin: 2px 0 0; }
+    .btn { padding: 9px 14px; min-height: 40px; }
+    .stats-bar { padding: 0 14px; }
+    .stat { flex: 1 1 0; padding: 10px 6px; margin-right: 0; }
+    .stat-val { font-size: 19px; }
+    .stat-label { font-size: 9px; letter-spacing: 0.05em; }
+    .main { padding: 14px; }
+    .albums-grid { grid-template-columns: 1fr; gap: 12px; }
+    .album-card { padding: 14px; }
+    .status-pill { min-height: 36px; padding: 6px 12px; }
+    .type-btn { min-height: 40px; font-size: 12px; padding: 4px 2px; }
+    .link-btn { min-height: 38px; padding: 6px 12px; font-size: 12px; }
+    .toast { left: 14px; right: 14px; bottom: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -418,7 +448,8 @@ async function fetchAlbums() {
     type: r[2] || 'rendelő',
     status: r[3] || '🔴 zárt',
     drive: r[4] || '',
-    orders: r[5] || '0'
+    orders: r[5] || '0',
+    ugyfelkor: r[12] || 'család'
   })).filter(a => a.id);
 }
 
@@ -460,6 +491,13 @@ function albumCard(a) {
       <button class="type-btn ${a.type==='rendelő'?'active':''}" onclick="setType('${a.id}',${a.row},'rendelő')">Rendelő</button>
       <button class="type-btn ${a.type==='válogató'?'active':''}" onclick="setType('${a.id}',${a.row},'válogató')">Válogató</button>
       <button class="type-btn ${a.type==='mindkettő'?'active':''}" onclick="setType('${a.id}',${a.row},'mindkettő')">Mindkettő</button>
+    </div>
+    <div class="kor-row">
+      <span class="kor-label">Ügyfélkör</span>
+      <div class="type-selector">
+        <button class="type-btn ${a.ugyfelkor==='család'?'active':''}" onclick="setKor('${a.id}','család')">Család</button>
+        <button class="type-btn ${a.ugyfelkor==='iskola-óvoda'?'active':''}" onclick="setKor('${a.id}','iskola-óvoda')">Iskola-óvoda</button>
+      </div>
     </div>
     <div class="album-footer">
       <div class="rendelesek"><strong>${a.orders}</strong> rendelés</div>
@@ -520,6 +558,16 @@ async function setType(id, row, type) {
   if (await cellaModosit(a, 'C', 'type', type)) {
     a.type = type; renderAlbums();
     showToast(`Típus: ${type}`, 'success');
+  }
+}
+
+async function setKor(id, ertek) {
+  const a = albums.find(x => x.id === id);
+  if (!a) return;
+  showToast('Mentés...');
+  if (await cellaModosit(a, 'M', 'ugyfelkor', ertek)) {
+    a.ugyfelkor = ertek; renderAlbums();
+    showToast('Ügyfélkör: ' + ertek, 'success');
   }
 }
 
