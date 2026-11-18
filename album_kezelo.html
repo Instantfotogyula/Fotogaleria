@@ -436,6 +436,14 @@ const WEBHOOK = 'https://script.google.com/macros/s/AKfycbxOfQNPIlvMDw7MYIXlsIiR
 
 let albums = [];
 
+// Az M oszlop szövege bármilyen írásmódban lehet (pl. „Iskola/óvoda”); az iskola/óvoda szó alapján értelmezzük
+function korNorm(v) {
+  v = String(v || '').trim();
+  if (!v) return '';
+  const t = v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /iskola|ovoda/.test(t) ? 'iskola-óvoda' : 'család';
+}
+
 async function fetchAlbums() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Album%20kezel%C5%91?key=${API_KEY}`;
   const res = await fetch(url);
@@ -449,7 +457,8 @@ async function fetchAlbums() {
     status: r[3] || '🔴 zárt',
     drive: r[4] || '',
     orders: r[5] || '0',
-    ugyfelkor: r[12] || ''
+    ugyfelkor: korNorm(r[12]),
+    ugyfelkorRaw: r[12] || ''
   })).filter(a => a.id);
 }
 
@@ -527,12 +536,19 @@ async function cellaModosit(a, oszlop, mezo, ertek) {
   const pin = adminPin();
   if (!pin) { showToast('Jelszó nélkül nem módosítható'); return false; }
   const url = `${WEBHOOK}?action=updateCell&range=${encodeURIComponent('Album kezelő!' + oszlop + a.row)}&value=${encodeURIComponent(ertek)}&pin=${encodeURIComponent(pin)}`;
-  await fetch(url, { method: 'GET', mode: 'no-cors' });
+  let valasz = '';
+  try { valasz = ((await (await fetch(url)).text()) || '').trim(); }
+  catch (e) { await fetch(url, { method: 'GET', mode: 'no-cors' }); }
+  if (/^Hiba/.test(valasz)) {
+    if (/jogosulatlan/.test(valasz)) pinTorol();
+    showToast('Szerver: ' + valasz.substring(0, 90), '', 7000);
+    return false;
+  }
   for (const varakozas of [2500, 3000]) {
     await new Promise(r => setTimeout(r, varakozas));
     try {
       const friss = (await fetchAlbums()).find(x => x.id === a.id);
-      if (friss && friss[mezo] === ertek) return true;
+      if (friss && friss[mezo] === ertek && (mezo !== 'ugyfelkor' || friss.ugyfelkorRaw !== '')) return true;
     } catch (e) {}
   }
   pinTorol();
@@ -592,11 +608,11 @@ function showEmpty() {
     `<div class="empty"><div class="empty-icon">📂</div>Még nincsenek albumok.</div>`;
 }
 
-function showToast(msg, type = '') {
+function showToast(msg, type = '', ms = 3000) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = `toast show ${type}`;
-  setTimeout(() => { t.className = 'toast'; }, 3000);
+  setTimeout(() => { t.className = 'toast'; }, ms);
 }
 
 
