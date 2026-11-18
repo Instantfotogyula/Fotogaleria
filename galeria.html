@@ -466,6 +466,7 @@
   <div id="modal">
     <h2 id="modal-cim">🛒 Összesítő</h2>
     <input class="nev-input" id="rendelo-nev" placeholder="Az Ön neve *" type="text">
+    <input class="nev-input" id="rendelo-diak" placeholder="A gyermek / diák neve *" type="text" style="display:none" autocomplete="off">
     <input class="nev-input" id="rendelo-email" placeholder="Email cím *" type="email">
     <div id="ossz-lista"></div>
     <div class="ossz-total"><span>Összesen:</span><span id="ossz-ar">0 Ft</span></div>
@@ -527,7 +528,7 @@ async function init() {
 
   try {
     // Sheets beolvasás
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:L100?key=${CONFIG.apiKey}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetsId}/values/Album%20kezel%C5%91!A2:M100?key=${CONFIG.apiKey}`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('Sheets API hiba: ' + resp.status);
     const data = await resp.json();
@@ -551,6 +552,7 @@ async function init() {
       egysegAr:   parseInt(row[6]) || 0,
       webhookUrl: row[10] || '',
       meretek:    row[11] || '',   // L oszlop: engedélyezett méretek (üres = Árlista alapbeállítása)
+      ugyfelkor:  row[12] || '',   // M oszlop: Ügyfélkör típusa (család / iskola-óvoda; üres = család)
     };
 
     webhookUrl = albumConfig.webhookUrl;
@@ -592,6 +594,14 @@ async function init() {
     mutat('hiba');
     document.getElementById('hiba-szoveg').textContent = 'Hiba: ' + e.message;
   }
+}
+
+// Iskolai / óvodai album: az Album kezelő M oszlopa (Ügyfélkör típusa) tartalmaz 'iskola' vagy 'óvoda' szót.
+// Csak rendelős albumnál számít (a válogató mód nem tárol diák nevet). Üres vagy ismeretlen érték = család.
+function iskolaAlbum() {
+  if (!albumConfig || albumConfig.tipus === 'válogató') return false;
+  const t = String(albumConfig.ugyfelkor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /iskola|ovoda/.test(t);
 }
 
 function meretNorm(s) {
@@ -878,6 +888,7 @@ function kosarMegnyit() {
 
   document.getElementById('ossz-ar').textContent = albumConfig.tipus === 'válogató' ? '' : osszAr.toLocaleString('hu-HU') + ' Ft';
   document.getElementById('kuldes-btn').disabled = !vanAdat;
+  document.getElementById('rendelo-diak').style.display = iskolaAlbum() ? 'block' : 'none';
   document.getElementById('modal-bg').classList.add('aktiv');
 }
 
@@ -892,6 +903,12 @@ async function rendeleKuld() {
   if (!nev) {
     alert('Kérjük add meg a nevedet!');
     document.getElementById('rendelo-nev').focus();
+    return;
+  }
+  const diak = iskolaAlbum() ? document.getElementById('rendelo-diak').value.trim() : '';
+  if (iskolaAlbum() && !diak) {
+    alert('Kérjük add meg a gyermek (diák) nevét!');
+    document.getElementById('rendelo-diak').focus();
     return;
   }
   if (!email || !email.includes('@')) {
@@ -942,6 +959,7 @@ async function rendeleKuld() {
       adatok: JSON.stringify(adatok),
       idopont: new Date().toISOString()
     });
+    if (diak) params.set('diak', diak);   // csak iskolai/óvodai albumnál
     // no-cors: a válasz tartalmát nem látjuk, de a hálózati hibát igen
     await fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
   } catch(e) {
