@@ -336,6 +336,49 @@
   }
   #fullscreen-info { color: rgba(255,255,255,0.7); margin-top: 0.75rem; font-size: 0.85rem; }
 
+  /* Fullscreen lapozás + jelölés (csak válogató albumnál, .nav osztállyal) */
+  #fullscreen { touch-action: pinch-zoom; }
+  #fullscreen img { transition: opacity 0.15s; }
+  #fullscreen.nav img {
+    max-height: calc(100vh - 10rem);
+    max-height: calc(100dvh - 10rem);
+  }
+  #fullscreen.kijelolt img { box-shadow: 0 0 0 3px var(--accent2); }
+  .fs-nyil {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem; height: 3rem;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 2rem;
+    line-height: 1;
+    padding-bottom: 0.25rem;
+    cursor: pointer;
+    z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fs-nyil:hover { background: rgba(255,255,255,0.3); }
+  .fs-bal  { left: 0.75rem; }
+  .fs-jobb { right: 0.75rem; }
+  .fs-valogat {
+    margin-top: 0.75rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 2rem;
+    border: 2px solid rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .fs-valogat.be { background: var(--accent); border-color: var(--accent); }
+  #fullscreen:not(.nav) .fs-nyil,
+  #fullscreen:not(.nav) .fs-valogat { display: none; }
+
   /* Modal */
   #modal-bg {
     display: none;
@@ -424,6 +467,9 @@
     .meret-ar { display: none; }
     header h1 { font-size: 1rem; }
     .progress-bar { width: 100px; }
+    .fs-nyil { width: 2.4rem; height: 2.4rem; font-size: 1.6rem; background: rgba(0,0,0,0.35); }
+    .fs-bal  { left: 0.3rem; }
+    .fs-jobb { right: 0.3rem; }
   }
 </style>
 </head>
@@ -457,8 +503,11 @@
 <!-- Fullscreen -->
 <div id="fullscreen">
   <button id="fullscreen-close" onclick="fullscreenBezar()">✕</button>
+  <button class="fs-nyil fs-bal" onclick="fullscreenLep(-1)" aria-label="Előző kép">‹</button>
+  <button class="fs-nyil fs-jobb" onclick="fullscreenLep(1)" aria-label="Következő kép">›</button>
   <img id="fullscreen-img" src="" alt="">
   <div id="fullscreen-info"></div>
+  <button class="fs-valogat" id="fs-valogat" onclick="fullscreenValogat()">☐ Ezt szeretném retusálva</button>
 </div>
 
 <!-- Modal -->
@@ -700,9 +749,8 @@ function galeriaMegjelenít() {
   const isValogato = albumConfig.tipus === 'válogató';
   const isMindketto = albumConfig.tipus === 'mindkettő';
 
-  kepek.forEach(kep => {
+  kepek.forEach((kep, idx) => {
     const thumbUrl = `https://drive.google.com/thumbnail?id=${kep.id}&sz=w400`;
-    const fullUrl  = `https://drive.google.com/thumbnail?id=${kep.id}&sz=w1200`;
     const sorszam  = kep.name.replace(/\.[^.]+$/, '');
 
     const kartya = document.createElement('div');
@@ -736,7 +784,7 @@ function galeriaMegjelenít() {
         <img src="${thumbUrl}" alt="${sorszam}" loading="lazy" draggable="false">
         <div class="kep-sorszam">${sorszam}</div>
         <div class="kep-pipa">✓</div>
-        <div class="kep-zoom" onclick="event.stopPropagation(); fullscreenMegnyit('${fullUrl}', '${sorszam}')">🔍</div>
+        <div class="kep-zoom" onclick="event.stopPropagation(); fullscreenMegnyit(${idx})">🔍</div>
       </div>
       <div class="rendeles-panel">${panelHtml}</div>
     `;
@@ -744,7 +792,7 @@ function galeriaMegjelenít() {
     // Dupla kattintás = fullscreen (asztali gépen)
     kartya.querySelector('img').addEventListener('dblclick', e => {
       e.stopPropagation();
-      fullscreenMegnyit(fullUrl, sorszam);
+      fullscreenMegnyit(idx);
     });
 
     grid.appendChild(kartya);
@@ -836,14 +884,86 @@ function csomagFrissit() {
 // ============================================================
 // FULLSCREEN
 // ============================================================
-function fullscreenMegnyit(url, sorszam) {
-  document.getElementById('fullscreen-img').src = url;
-  document.getElementById('fullscreen-info').textContent = sorszam;
-  document.getElementById('fullscreen').classList.add('aktiv');
+let fsIdx = -1;     // a nagy nézetben éppen látott kép indexe a kepek tömbben
+let fsNav = false; // lapozás + jelölés csak válogató albumnál
+
+function nagyUrl(id) { return `https://drive.google.com/thumbnail?id=${id}&sz=w1200`; }
+
+function fullscreenMegnyit(idx) {
+  fsNav = !!albumConfig && albumConfig.tipus === 'válogató';
+  const fs = document.getElementById('fullscreen');
+  fs.classList.toggle('nav', fsNav);
+  fsMutat(idx);
+  fs.classList.add('aktiv');
 }
+
+function fsMutat(idx) {
+  const n = kepek.length;
+  if (!n) return;
+  fsIdx = ((idx % n) + n) % n;               // körbeér az elején és a végén
+  const kep = kepek[fsIdx];
+  const sorszam = kep.name.replace(/\.[^.]+$/, '');
+  const img = document.getElementById('fullscreen-img');
+  if (fsNav && n > 1) {
+    img.style.opacity = '0.4';               // jelzi, hogy tölt az új kép
+    img.onload = img.onerror = () => { img.style.opacity = '1'; };
+  } else {
+    img.style.opacity = '1';
+  }
+  img.src = nagyUrl(kep.id);
+  document.getElementById('fullscreen-info').textContent = fsNav ? `${sorszam}  ·  ${fsIdx + 1} / ${n}` : sorszam;
+  if (fsNav) {
+    fsFrissitJeloles();
+    // a két szomszédos kép előtöltése, hogy lapozáskor ne villanjon
+    [fsIdx + 1, fsIdx - 1].forEach(i => { new Image().src = nagyUrl(kepek[((i % n) + n) % n].id); });
+  }
+}
+
+function fullscreenLep(irany) {
+  if (!fsNav || !document.getElementById('fullscreen').classList.contains('aktiv')) return;
+  fsMutat(fsIdx + irany);
+}
+
+function fsFrissitJeloles() {
+  const be = !!kivalasztott[kepek[fsIdx].id];
+  const gomb = document.getElementById('fs-valogat');
+  gomb.textContent = be ? '✅ Kiválasztva' : '☐ Ezt szeretném retusálva';
+  gomb.classList.toggle('be', be);
+  document.getElementById('fullscreen').classList.toggle('kijelolt', be);
+}
+
+function fullscreenValogat() {
+  if (!fsNav || fsIdx < 0) return;
+  valogatoToggle(kepek[fsIdx].id);           // ugyanaz a jelölés, mint a lista nézetben
+  fsFrissitJeloles();
+}
+
 function fullscreenBezar() {
-  document.getElementById('fullscreen').classList.remove('aktiv');
+  const fs = document.getElementById('fullscreen');
+  const nyitva = fs.classList.contains('aktiv');
+  fs.classList.remove('aktiv');
+  if (nyitva && fsNav && fsIdx >= 0) {       // a listában oda ugrik, ahol a nagy nézetben tartott
+    const kartya = document.getElementById('kep-' + kepek[fsIdx].id);
+    if (kartya) kartya.scrollIntoView({ block: 'center' });
+  }
 }
+
+// Telefonon: balra/jobbra húzás = lapozás (egyujjas, vízszintes mozdulat; a kétujjas nagyítást nem zavarja)
+(function () {
+  const fs = document.getElementById('fullscreen');
+  let x0 = 0, y0 = 0, aktiv = false;
+  fs.addEventListener('touchstart', e => {
+    aktiv = fsNav && e.touches.length === 1 && !e.target.closest('button');
+    if (aktiv) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
+  }, { passive: true });
+  fs.addEventListener('touchend', e => {
+    if (!aktiv) return;
+    aktiv = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) fullscreenLep(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
 
 // ============================================================
 // KOSÁR / KÜLDÉS
@@ -991,7 +1111,11 @@ function mutat(id) {
   if (cel) cel.style.display = 'block';
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') fullscreenBezar(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fullscreenBezar();
+  else if (e.key === 'ArrowLeft') fullscreenLep(-1);
+  else if (e.key === 'ArrowRight') fullscreenLep(1);
+});
 </script>
 </body>
 </html>
