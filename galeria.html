@@ -1080,6 +1080,21 @@ async function rendeleKuld() {
       idopont: new Date().toISOString()
     });
     if (diak) params.set('diak', diak);   // csak iskolai/óvodai albumnál
+    if (albumConfig.tipus !== 'válogató') {
+      // A visszaigazoló e-mailhez: ugyanazok az árak, mint amit a vevő a kosárban lát
+      const ADAT_KULCS = { '7x9': '7*9 cm', '10x15': '10*15 cm', '13x18': '13*18 cm', '20x30': '20*30 cm', 'igazolvany': 'igazolványkép' };
+      const arak = {};
+      MERETEK.forEach(m => { if (ADAT_KULCS[m.id]) arak[ADAT_KULCS[m.id]] = [m.ar, m.egyseg, m.nev]; });
+      params.set('arak', JSON.stringify(arak));
+      if (albumConfig.csomagDb > 0 && albumConfig.egysegAr) {
+        let osszDb = 0;
+        kepek.forEach(kep => { const r = rendeles[kep.id]; if (r) MERETEK.forEach(m => { osszDb += r[m.id] || 0; }); });
+        if (osszDb > albumConfig.csomagDb) {
+          params.set('pluszdb', osszDb - albumConfig.csomagDb);
+          params.set('pluszar', (osszDb - albumConfig.csomagDb) * albumConfig.egysegAr);
+        }
+      }
+    }
     // no-cors: a válasz tartalmát nem látjuk, de a hálózati hibát igen
     await fetch(webhookUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
   } catch(e) {
